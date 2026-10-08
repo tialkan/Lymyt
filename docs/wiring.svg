@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1160" viewBox="0 0 1160 1160" role="img" aria-labelledby="title desc">
+<title id="title">Lymyt bağlantı planı</title><desc id="desc">Nano ESP32 Arduino pin adlarıyla iki e-paper ekran, seri dirençli LED ve I2C ADXL345 bağlantısı.</desc>
+<rect width="1160" height="1160" fill="#101a23"/><g transform="translate(0,165)">
+<style>text{font-family:Arial,sans-serif;fill:#eaf4f4} .small{font-size:15px;fill:#a6bcc3} .label{font-size:19px} .heading{font-size:24px;font-weight:700} .box{fill:#1b2a34;stroke:#46626d;stroke-width:2} .wire{fill:none;stroke:#72d6c0;stroke-width:3}</style>
+<text x="48" y="54" class="heading">LYMYT · breadboard bağlantı planı</text>
+<text x="48" y="83" class="small">Şematik pin planı · Arduino pin numaralandırması · USB-C güç / Wi-Fi veri</text>
+<rect x="430" y="140" width="300" height="440" rx="20" class="box"/>
+<text x="450" y="176" class="heading">Nano ESP32</text>
+<text x="450" y="212" class="label">3V3 → ortak + ray</text>
+<text x="450" y="241" class="label">GND → ortak − ray</text>
+<text x="450" y="270" class="label">D11 → iki DIN / MOSI</text>
+<text x="450" y="299" class="label">D13 → iki CLK / SCK</text>
+<text x="450" y="328" class="label">D10 / D9 / D8 / D7 → sol</text>
+<text x="450" y="357" class="label">D6 / D5 / D4 / D3 → sağ</text>
+<text x="450" y="386" class="label">A0 → LED + direnç</text>
+<text x="450" y="415" class="label">A4 / A5 → I²C</text>
+<text x="450" y="444" class="label">A1 → hareket OUT*</text>
+<text x="450" y="473" class="label">D2 → buton → GND</text>
+<rect x="48" y="140" width="306" height="290" rx="20" class="box"/>
+<text x="68" y="176" class="heading">SOL GÖZ · CODEX</text>
+<text x="68" y="212" class="label">VCC / GND → ortak ray</text>
+<text x="68" y="241" class="label">DIN → D11 · CLK → D13</text>
+<text x="68" y="270" class="label">CS → D10</text>
+<text x="68" y="299" class="label">DC → D9</text>
+<text x="68" y="328" class="label">RST → D8</text>
+<text x="68" y="357" class="label">BUSY → D7</text>
+<rect x="806" y="140" width="306" height="290" rx="20" class="box"/>
+<text x="826" y="176" class="heading">SAĞ GÖZ · CLAUDE</text>
+<text x="826" y="212" class="label">VCC / GND → ortak ray</text>
+<text x="826" y="241" class="label">DIN → D11 · CLK → D13</text>
+<text x="826" y="270" class="label">CS → D6</text>
+<text x="826" y="299" class="label">DC → D5</text>
+<text x="826" y="328" class="label">RST → D4</text>
+<text x="826" y="357" class="label">BUSY → D3</text>
+<path d="M354 282 H430" class="wire"/><path d="M730 282 H806" class="wire"/>
+<rect x="48" y="480" width="306" height="180" rx="20" class="box"/>
+<text x="68" y="516" class="heading">ADXL345 · I²C</text>
+<text x="68" y="552" class="label">VCC → 3V3 · GND → GND</text>
+<text x="68" y="581" class="label">SDA → A4 · SCL → A5</text>
+<text x="68" y="610" class="label">CS → 3V3 · SDO → GND</text>
+<text x="68" y="639" class="label">Varsayılan adres: 0x53</text>
+<path d="M354 537 H390 V454 H430" class="wire"/>
+<rect x="806" y="480" width="306" height="180" rx="20" class="box"/>
+<text x="826" y="516" class="heading">MAVİ LED</text>
+<text x="826" y="552" class="label">A0 → 330 Ω → anot (+)</text>
+<text x="826" y="581" class="label">Katot (−) → GND</text>
+<text x="826" y="610" class="label">Uzun bacak: anot</text>
+<text x="826" y="639" class="label">Tek LED ile başla</text>
+<path d="M730 425 H770 V537 H806" class="wire"/>
+<text x="48" y="714" class="label">1  Önce sol ekran. Firmware: LYMYT_RIGHT_EYE_ENABLED=false</text>
+<text x="48" y="746" class="label">2  Görüntü doğrulanınca sağ ekranı, sonra LED ve ADXL345’i ekle.</text>
+<text x="48" y="778" class="small">* Hareket sensörü model/OUT seviyesi doğrulanmadan bağlanmaz. GPIO 3.3 V. LED seri dirençle kullanılır.</text>
+<text x="48" y="804" class="small">Panel sürücüsü V2 / SSD1681 varsayımıdır; kartın rev2.1 yazısı panel kimliğini tek başına doğrulamaz.</text>
+</g></svg>

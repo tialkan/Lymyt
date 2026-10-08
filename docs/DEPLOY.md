@@ -13,7 +13,7 @@ Nano ayrıca Mac yardımcısına doğrudan bağlanabilir; o durumda fiziksel tel
 
 ## Bu kurulumun durumu
 
-8 Ekim 2026: [private GitHub reposu](https://github.com/tialkan/Lymyt) ve ayrı Lymyt/production Coolify uygulaması oluşturuldu. Dockerfile dağıtımı `968d5f4` commit'inden tamamlandı. Relay 8787 portunda çalışıyor; named volume `/data` hedefinde bağlı. HTTPS `tezatlas.info` uygulamada ayarlı. Turkticaret oturumu sona erdiği için DNS değişmedi; TLS ve Mac → VPS senkronizasyonu henüz doğrulanmadı.
+8 Ekim 2026: [private GitHub reposu](https://github.com/tialkan/Lymyt) ve ayrı Lymyt/production Coolify uygulaması oluşturuldu. Dockerfile dağıtımı `968d5f4` commit'inden tamamlandı. Relay 8787 portunda çalışıyor; named volume `/data` hedefinde bağlı. HTTPS `tezatlas.info` uygulamada ayarlı. Cloudflare Free zone'u, proxied A=157.90.232.143 ve www CNAME hazırlandı. Nameserver devri bekliyor; TLS ve Mac → VPS senkronizasyonu henüz doğrulanmadı. [Cloudflare kurulumu](CLOUDFLARE.md).
 
 [Coolify uygulaması](http://157.90.232.143:8000/project/dg4k8gsk84sc84csc84sgsk0/environment/c4cwgwg0kcccwskg8o4go0o4/application/w0wsg0o8woogs8c4cwwkk0s0).
 
@@ -42,6 +42,6 @@ Yardımcı ürün, yüzde, pencere süresi, gözlem ve yenilenme zamanlarını g
 
 ## DNS
 
-8 Ekim 2026'da panelde görülen: kök A=`31.186.11.254`, www CNAME=`tezatlas.info` (iki aynı CNAME satırı). Nameserver'lar Turkticaret üzerinde. Hedef VPS doğrulanıp uygulama hazırlandıktan sonra kök A kaydı VPS IP'sine güncellenir.
+8 Ekim 2026'da panelde görülen: kök A=`31.186.11.254`, www CNAME=`tezatlas.info` (iki aynı CNAME satırı). Panel ns1/ns2.turkticaret.net gösteriyordu; dış NS sorgusunda ns3.turkticaret.net de görüldü. DS kaydı bulunmadı. Hedef VPS doğrulanıp uygulama hazırlandıktan sonra kök A kaydı VPS IP'sine güncellenir.
 
 Yayın doğrulaması: uygulama portu, /data yazımı, TLS, yetkisiz /v1/status isteğinin 401 olması, yerel HTTPS senkronizasyonu. Bu dosyanın bulunması yayının tamamlandığını göstermez.

@@ -14,6 +14,8 @@ Güç varken kablo değiştirme. Nano’nun GPIO sinyalleri 3.3 V’tur. Modül 
 
 Nano **3V3** pinini breadboard’un artı rayına, **GND** pinini eksi rayına götür. Bazı breadboard rayları ortadan kesiktir: iki yarıyı kullanıyorsan birer jumper ile birleştir. İlk aşamada bütün çevre birimlerini bu 3.3 V rayından besle; USB/VBUS/5V rayını e-paper sinyal pinlerine bağlama.
 
+![Lymyt şematik bağlantı planı](wiring.png)
+
 ## 2. Önce tek gözü bağla
 
 Modülde VCC, GND, DIN, CLK, CS, DC, RST, BUSY pinlerini bul. İki ekranın ortak bağlantıları yalnızca besleme, GND, DIN ve CLK olacak; CS/DC/RST/BUSY ayrı tutulacak.
