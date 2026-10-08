@@ -11,6 +11,9 @@
 // Rev2.1 describes the carrier board, not necessarily the panel controller.
 #define LYMYT_PANEL_CLASS GxEPD2_154_D67
 
+// Set false for the first bench test with only the left screen attached.
+#define LYMYT_RIGHT_EYE_ENABLED true
+
 // Leave false for the first hardware check. Enable only after partial refresh
 // is verified on the actual panel. Full cleanup occurs after 5 partial updates.
 #define LYMYT_PARTIAL_REFRESH false

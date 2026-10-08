@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <GxEPD2_BW.h>
 #include <SPI.h>
+#include <time.h>
 #include "config.h"
 #if LYMYT_USE_ADXL345
 #include <Wire.h>
@@ -39,6 +40,7 @@ uint32_t sparkleUntil = 0;
 uint32_t pressStarted = 0;
 bool previousPress = false, pressHandled = false;
 bool accelerometerReady = false, motion = false;
+bool ntpStarted = false;
 float accelX = 0, accelY = 0, accelZ = 0;
 uint32_t lastSensorRead = 0, lastPresence = 0, lastShake = 0;
 uint32_t interactionUntil = 0;
@@ -47,6 +49,8 @@ int tiltGaze = 0;
 bool beginHttp(HTTPClient& http, WiFiClient& plain, WiFiClientSecure& secure, const String& url) {
   if (url.startsWith("https://")) {
     if (!strlen(LYMYT_ROOT_CA)) return false;
+    // TLS certificate validity needs the ESP32 system clock, not our display clock.
+    if (time(nullptr) < 1700000000) return false;
     secure.setCACert(LYMYT_ROOT_CA);
     return http.begin(secure, url);
   }
@@ -257,7 +261,7 @@ void setup() {
   lastPresence = millis();
   SPI.begin();  // Nano ESP32 default: SCK=D13, MOSI=D11, MISO=D12 (unused).
   leftEye.init(115200, true, 2, false);
-  rightEye.init(115200, true, 2, false);
+  if (LYMYT_RIGHT_EYE_ENABLED) rightEye.init(115200, true, 2, false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(LYMYT_WIFI_SSID, LYMYT_WIFI_PASSWORD);
   lastConnect = millis();
@@ -265,6 +269,10 @@ void setup() {
 
 void loop() {
   readSensors(); updateButton(); updateLight();
+  if (!ntpStarted && WiFi.status() == WL_CONNECTED && String(LYMYT_BRIDGE_URL).startsWith("https://")) {
+    configTime(0, 0, "time.cloudflare.com", "pool.ntp.org");
+    ntpStarted = true;
+  }
   if (WiFi.status() != WL_CONNECTED && millis() - lastConnect >= 30000) {
     WiFi.reconnect(); lastConnect = millis();
   }
@@ -273,7 +281,7 @@ void loop() {
   if (firstFrame || millis() - lastDraw >= interval) {
     bool full = firstFrame || !LYMYT_PARTIAL_REFRESH || refreshCount >= 5;
     drawEye(leftEye, providers[0], "CODEX", full, 5);
-    drawEye(rightEye, providers[1], "CLAUDE", full, -5);
+    if (LYMYT_RIGHT_EYE_ENABLED) drawEye(rightEye, providers[1], "CLAUDE", full, -5);
     refreshCount = full ? 0 : refreshCount + 1;
     firstFrame = false; lastDraw = millis();
   }

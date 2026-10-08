@@ -11,6 +11,12 @@ Mac: Codex + Claude → yerel yardımcı → HTTPS /v1/ingest
 
 Nano ayrıca Mac yardımcısına doğrudan bağlanabilir; o durumda fiziksel telemetri sadece yerel yardımcıda görünür. VPS'e bağlı Nano için güvenilir TLS kök CA'sı `config.h` içine konmalıdır; sertifika doğrulaması kapatılmaz.
 
+## Bu kurulumun durumu
+
+8 Ekim 2026: [private GitHub reposu](https://github.com/tialkan/Lymyt) ve ayrı Lymyt/production Coolify uygulaması oluşturuldu. Dockerfile dağıtımı `968d5f4` commit'inden tamamlandı. Relay 8787 portunda çalışıyor; named volume `/data` hedefinde bağlı. HTTPS `tezatlas.info` uygulamada ayarlı. Turkticaret oturumu sona erdiği için DNS değişmedi; TLS ve Mac → VPS senkronizasyonu henüz doğrulanmadı.
+
+[Coolify uygulaması](http://157.90.232.143:8000/project/dg4k8gsk84sc84csc84sgsk0/environment/c4cwgwg0kcccwskg8o4go0o4/application/w0wsg0o8woogs8c4cwwkk0s0).
+
 ## Coolify
 
 - Proje: Lymyt, ortam: production; kaynak: bu GitHub reposu.
