@@ -1,0 +1,4 @@
+.lymyt/
+__pycache__/
+*.pyc
+firmware/**/config.h

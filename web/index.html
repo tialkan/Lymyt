@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Lymyt Studio</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="studio">
+    <aside class="rail">
+      <a href="/" class="wordmark" aria-label="Lymyt Studio">lymyt<span>●</span></a>
+      <div class="rail-caption">MASA ARKADAŞIN</div>
+      <nav aria-label="Studio"><a href="#companion" class="active">Karakter</a><a href="#limits">Limitler</a><a href="#connection">Bağlantı</a></nav>
+      <div class="rail-footer">İki göz.<br>Bir küçük kişilik.<br><span>Studio / ilk prototip</span></div>
+    </aside>
+    <main>
+      <header>
+        <div class="breadcrumb">LYMYT STUDIO <span>/</span> MASANDA</div>
+        <div class="connection-pill"><span class="status-dot"></span><span id="mode-label">Örnek veriler</span></div>
+      </header>
+      <section class="intro">
+        <div class="eyebrow">KAPASİTENİN BİR YÜZÜ VAR.</div>
+        <h1>Birlikte biraz<br><em>soluklanalım.</em></h1>
+        <p>Codex ve Claude Code’un temposunu taşıyan küçük masa arkadaşın.</p>
+      </section>
+      <section class="companion-layout" id="companion" aria-label="Lymyt karakter önizlemesi">
+        <div class="stage">
+          <div class="stage-top"><span>LYMYT / ÖNDEN GÖRÜNÜM</span><span>2 × E-PAPER</span></div>
+          <div class="scene">
+            <div class="character" id="character">
+              <div class="antenna"><span id="halo"></span></div>
+              <div class="shell">
+                <div class="shell-brand">lymyt</div>
+                <div class="eye-pair">
+                  <div class="eye" id="eye-openai" data-mood="ready" role="img" aria-label="Codex gözü">
+                    <div class="eye-label">CODEX</div>
+                    <div class="expression"><div class="pupil"><i></i></div></div>
+                    <div class="eye-percent" id="eye-openai-percent">%75 kaldı</div>
+                    <div class="eye-time" id="eye-openai-time">2s 14dk</div>
+                  </div>
+                  <div class="eye right" id="eye-claude" data-mood="low" role="img" aria-label="Claude gözü">
+                    <div class="eye-label">CLAUDE</div>
+                    <div class="expression"><div class="pupil"><i></i></div></div>
+                    <div class="eye-percent" id="eye-claude-percent">%12 kaldı</div>
+                    <div class="eye-time" id="eye-claude-time">48dk</div>
+                  </div>
+                </div>
+                <div class="mouth" aria-hidden="true"></div>
+              </div>
+              <div class="feet" aria-hidden="true"><i></i><i></i></div>
+            </div>
+          </div>
+          <div class="stage-bottom"><span id="character-note" aria-live="polite">Bir göz çalışmaya hazır. Diğeri biraz yoruldu.</span><span>GÖRSEL ÖNİZLEME</span></div>
+        </div>
+        <div class="behavior">
+          <div class="eyebrow">KÜÇÜK BİR KARAKTER</div>
+          <h2>Ruh hali,<br>kapasitesinde.</h2>
+          <p>Her göz kendi uygulamasını takip eder. Birinin limiti dolarken diğeri merakla bakmaya devam edebilir.</p>
+          <div class="scenario-label">ÖRNEK DURUMU DENE</div>
+          <div class="scenarios" aria-label="Örnek durumlar">
+            <button type="button" data-scenario="mixed" aria-pressed="true">Meraklı & mahmur <span>↗</span></button>
+            <button type="button" data-scenario="sleep" aria-pressed="false">Biraz mola <span>↗</span></button>
+            <button type="button" data-scenario="renewed" aria-pressed="false">Yeniden hazır <span>↗</span></button>
+            <button type="button" data-scenario="offline" aria-pressed="false">Bağlantı kesildi <span>↗</span></button>
+          </div>
+          <div class="hardware-note">E-paper ifadeleri seyrek yenilenir. Görseldeki ışık, eklenebilecek bir LED fikridir.</div>
+        </div>
+      </section>
+      <section id="limits" class="limits-section">
+        <div class="section-title"><h2>Kalan enerji</h2><label class="window-picker">Pencere <select id="window-choice"><option value="short">Kısa süreli</option><option value="week">Haftalık</option></select></label></div>
+        <div class="limit-grid">
+          <article class="quota codex">
+            <div class="quota-head"><h3>Codex</h3><span id="openai-status">Örnek</span></div>
+            <div class="quota-value"><strong id="openai-percent">75</strong><span>% kaldı</span></div>
+            <div class="meter" role="progressbar" id="openai-meter" aria-label="Codex kalan kapasite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75"><div></div></div>
+            <div class="quota-footer"><span>Yenilenmesine</span><strong id="openai-countdown">2s 14dk</strong></div>
+            <div class="freshness" id="openai-age">Örnek veri</div>
+          </article>
+          <article class="quota claude">
+            <div class="quota-head"><h3>Claude Code</h3><span id="claude-status">Örnek</span></div>
+            <div class="quota-value"><strong id="claude-percent">12</strong><span>% kaldı</span></div>
+            <div class="meter" role="progressbar" id="claude-meter" aria-label="Claude kalan kapasite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="12"><div></div></div>
+            <div class="quota-footer"><span>Yenilenmesine</span><strong id="claude-countdown">48dk</strong></div>
+            <div class="freshness" id="claude-age">Örnek veri</div>
+          </article>
+        </div>
+      </section>
+      <section id="connection" class="connection-section">
+        <div><div class="eyebrow">BİLGİSAYAR → WI-FI → LYMYT</div><h2>Gerçek veriye bağlan.</h2><p>Yardımcı servisin cihaz anahtarını gir. Hesap oturumları bilgisayarında kalır.</p></div>
+        <form id="connect-form">
+          <label for="device-token">Cihaz anahtarı <span>.lymyt/device-token</span></label>
+          <div class="connect-row"><input id="device-token" type="password" required autocomplete="off" placeholder="Anahtarı buraya yapıştır"><button type="submit">Bağlan</button><button type="button" id="demo-button" class="secondary">Demo</button></div>
+          <div id="connection-message" role="status">Şu an örnek veriler gösteriliyor. Fiziksel cihaz henüz bağlanmadı.</div>
+        </form>
+      </section>
+      <footer><span>LYMYT — KÜÇÜK MOLALARA BÜYÜK BİR YÜZ.</span><span>Arduino Nano ESP32 · Waveshare e-paper</span></footer>
+    </main>
+  </div>
+</body>
+</html>

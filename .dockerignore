@@ -1,0 +1,7 @@
+.git
+.lymyt
+__pycache__
+tests
+firmware
+docs
+*.md
