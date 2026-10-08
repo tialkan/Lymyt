@@ -12,7 +12,7 @@ Bu rehber iki Waveshare siyah-beyaz 1.54″ ekran, Arduino Nano ESP32, tek 5 mm 
 
 Güç varken kablo değiştirme. Nano’nun GPIO sinyalleri 3.3 V’tur. Modül üzerindeki pin isimlerini esas al; kablo rengine göre karar verme. Nano’yu breadboard’un orta kanalına yerleştir; iki taraftaki pinler birbirine kısa devre olmasın.
 
-Nano **3V3** pinini breadboard’un artı rayına, **GND** pinini eksi rayına götür. Bazı breadboard rayları ortadan kesiktir: iki yarıyı kullanıyorsan birer jumper ile birleştir. İlk aşamada bütün çevre birimlerini bu 3.3 V rayından besle; USB/VBUS/5V rayını e-paper sinyal pinlerine bağlama.
+Numaralı delikleri izlemek için **[üç aşamalı breadboard rehberini](BREADBOARD.md)** kullan. Bu çizimler güç rayları yerine 22. sıranın a–e kısmını **3V3**, 23. sıranın a–e kısmını **GND** olarak kullanır. Aşağıdaki tablolarda “ray” denilen besleme hatları bu iki sıra olabilir. Uzun kenar güç raylarını kullanmayı seçersen bazı kartlarda ortadan kesik olduklarını kontrol et. USB/VBUS/5V hattını e-paper sinyal pinlerine bağlama.
 
 ![Lymyt şematik bağlantı planı](wiring.png)
 

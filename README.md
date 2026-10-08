@@ -6,6 +6,7 @@
 - `bridge/lymyt.py`: Python 3.9+ bilgisayar yardımcısı ve VPS relay. Ek Python paketi gerektirmez.
 - `firmware/Lymyt/`: iki SPI ekran, LED tepkileri, ADXL345 eğim/sallama ve hareket girişi için firmware prototipi.
 - `docs/ASSEMBLY.md`: gerçek devre için adım adım kurulum ve sorun giderme.
+- `docs/BREADBOARD.md`: tek göz, iki göz ve sensör için numaralı deliklerle üç bağlantı çizimi.
 - `docs/HARDWARE.md`: pin planı ve doğrulanan kütüphaneler.
 - `Dockerfile`, `compose.yaml`: VPS/Coolify dağıtımı. Hesap oturumları bilgisayarda kalır.
 
@@ -43,7 +44,7 @@ Mevcut status line varsa önce yedekle/birleştir. Yardımcı bu ayarı otomatik
 
 ## Donanım
 
-[Adım adım devre rehberi](docs/ASSEMBLY.md) ve [pin planı](docs/HARDWARE.md). `config.example.h` dosyasını `config.h` olarak kopyala. Panel sürücüsü üretici sayfasına göre V2/SSD1681 varsayımıdır; **rev2.1** taşıyıcı kart yazısı tek başına kesin panel kimliği değildir. Üreticinin tek ekran örneğiyle doğrula.
+[Numaralı breadboard çizimleri](docs/BREADBOARD.md), [adım adım devre rehberi](docs/ASSEMBLY.md) ve [pin planı](docs/HARDWARE.md). `config.example.h` dosyasını `config.h` olarak kopyala. Panel sürücüsü üretici sayfasına göre V2/SSD1681 varsayımıdır; **rev2.1** taşıyıcı kart yazısı tek başına kesin panel kimliği değildir. Üreticinin tek ekran örneğiyle doğrula.
 
 İlk kurulum USB-C güç ve Wi-Fi veri kullanır. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. Temel firmware ve ADXL345/LED/hareket/buton seçenekleri açık sürüm Nano ESP32 için başarıyla derlendi. Yükleme, panel kimliği ve gerçek donanım testi henüz yapılmadı.
 
