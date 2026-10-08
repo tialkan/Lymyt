@@ -4,6 +4,16 @@ Hedef: Arduino Nano ESP32 + iki siyah-beyaz Waveshare 1.54 inch modül (kullanı
 
 Arduino IDE'de Arduino Nano ESP32 kartını ve `Tools > Pin Numbering > By Arduino pin` seç. GxEPD2, Adafruit GFX Library ve ArduinoJson 7 kütüphanelerini kur. `config.example.h` dosyasını aynı klasörde `config.h` olarak kopyala ve Wi-Fi, bilgisayarın yerel IP'si ve cihaz anahtarını gir.
 
+## Derleme doğrulaması
+
+8 Ekim 2026'da temel ve sensörlü yapılandırmalar `arduino:esp32:nano_nora:PinNumbers=default` kartı için derlendi. Arduino ESP32 Boards 2.0.18-arduino.5; GxEPD2 1.6.9; ArduinoJson 7.4.3; Adafruit GFX 1.12.6; ADXL345 1.3.4; Unified Sensor 1.1.15 kullanıldı. Bu, kablolama veya panel uyumluluğunun fiziksel doğrulaması değildir.
+
+```sh
+arduino-cli compile -b arduino:esp32:nano_nora:PinNumbers=default firmware/Lymyt
+```
+
+Komut öncesinde aynı klasörde `config.h` bulunmalıdır. Sensörlü doğrulamada LED=A0, buton=D2, hareket=A1 ve ADXL345 açık seçildi.
+
 ## Pin planı
 
 | Waveshare pini | Sol / Codex | Sağ / Claude |

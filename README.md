@@ -38,13 +38,13 @@ Kullanıcı ayarlarına eklenebilecek örnek:
 }
 ```
 
-Mevcut status line varsa önce yedekle/birleştir. Proje bu ayarı otomatik değiştirmez. Yalnızca limit alanları kaydedilir; hesap anahtarları veya transkriptler okunmaz. Pro/Max hesaplarında alanlar ilk API yanıtından sonra gelir. Eksik veriler sıfır sayılmaz. Gerçek Claude oturumundan veri alımı henüz doğrulanmadı.
+Mevcut status line varsa önce yedekle/birleştir. Yardımcı bu ayarı otomatik değiştirmez. Bu Mac'te kurulum sırasında status line ayarı eklendi; önceki durum `.lymyt/claude-statusline-before.json` içinde yedeklendi. Yalnızca limit alanları kaydedilir; hesap anahtarları veya transkriptler okunmaz. Pro/Max hesaplarında alanlar ilk API yanıtından sonra gelir. Eksik veriler sıfır sayılmaz. Gerçek Claude oturumundan veri alımı henüz doğrulanmadı.
 
 ## Donanım
 
 [Kablolama rehberi](docs/HARDWARE.md). `config.example.h` dosyasını `config.h` olarak kopyala. Panel sürücüsü üretici sayfasına göre V2/SSD1681 varsayımıdır; **rev2.1** taşıyıcı kart yazısı tek başına kesin panel kimliği değildir. Üreticinin tek ekran örneğiyle doğrula.
 
-İlk kurulum USB-C güç ve Wi-Fi veri kullanır. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. Firmware henüz derlenmedi, yüklenmedi veya gerçek donanımda test edilmedi.
+İlk kurulum USB-C güç ve Wi-Fi veri kullanır. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. Temel firmware ve ADXL345/LED/hareket/buton seçenekleri açık sürüm Nano ESP32 için başarıyla derlendi. Yükleme, panel kimliği ve gerçek donanım testi henüz yapılmadı.
 
 ## VPS
 
@@ -57,7 +57,7 @@ python3 -m unittest discover -s tests -v
 node --check web/app.js
 ```
 
-12 test: eksik alanlar, %0 kullanımı, biten geri sayım, çoklu Codex kovası, eski veri, HTTP yetkilendirmesi, ayrı relay yazma anahtarı ve telemetri. Gerçek Codex bağlantısı ayrıca kontrol edildi. Sensör eşikleri ve ekran yenilemesi fiziksel doğrulama bekliyor.
+12 test: eksik alanlar, %0 kullanımı, biten geri sayım, çoklu Codex kovası, eski veri, HTTP yetkilendirmesi, ayrı relay yazma anahtarı ve telemetri. Gerçek Codex bağlantısı ayrıca kontrol edildi. Firmware derlemesi: Arduino ESP32 Boards 2.0.18-arduino.5, GxEPD2 1.6.9, ArduinoJson 7.4.3, Adafruit GFX 1.12.6, ADXL345 1.3.4, Unified Sensor 1.1.15. Sensörlü sürüm flash alanının %32'sini, statik RAM'in %20'sini kullanıyor. Sensör eşikleri ve ekran yenilemesi fiziksel doğrulama bekliyor.
 
 ## Kaynaklar
 
