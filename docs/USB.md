@@ -1,5 +1,7 @@
 # USB ile ilk çalıştırma
 
+**Son fiziksel durum, 9 Ekim:** iki ekran beyaz kaldı. Kota aktarımı çalışsa da görüntü doğrulanmadı. [Ekran tanılama kaydı ve kontrol listesi](PANEL-CHECK.md) içindeki PanelCheck şu anda Nano'ya yüklü; normal USB köprüsü test için durduruldu. Kablolama/panel kimliği doğrulandıktan sonra aşağıdaki normal firmware'e dönülür.
+
 Wi-Fi ağı ve şifresi olmadan Nano ESP32'ye limit verisi göndermek için veri aktarabilen USB-C kablo kullanılır. Aynı kablo kartı besler. Bu sürüm yerel bilgisayar açıkken çalışır; VPS/domain gerekmez.
 
 `firmware/Lymyt/config.h` içinde:
