@@ -54,6 +54,7 @@
     get('mode-label').textContent = live ? 'Yardımcı servise bağlı' : 'Örnek veriler';
     document.body.dataset.live = String(live);
     const device = snapshot.device;
+    get('connection-path').textContent = live && device?.online ? device.transport === 'usb' ? 'BİLGİSAYAR → USB → LYMYT' : 'BİLGİSAYAR → WI-FI → LYMYT' : 'BİLGİSAYAR → LYMYT';
     get('character-note').textContent = live ? device?.online ? `Fiziksel Lymyt bağlı${device.motion === true ? ' · hareket algılandı' : ''}${device.acceleration ? ' · ADXL345 aktif' : ''}.` : 'Gerçek limit verileri · fiziksel cihaz çevrimdışı.' : scenarios[selected].note;
     document.querySelectorAll('[data-scenario]').forEach(button => {
       button.disabled = live;

@@ -7,6 +7,7 @@
 - `firmware/Lymyt/`: iki SPI ekran, LED tepkileri, ADXL345 eğim/sallama ve hareket girişi için firmware prototipi.
 - `docs/ASSEMBLY.md`: gerçek devre için adım adım kurulum ve sorun giderme.
 - `docs/BREADBOARD.md`: tek göz, iki göz ve sensör için numaralı deliklerle üç bağlantı çizimi.
+- `docs/USB.md`: Wi-Fi şifresi olmadan USB üzerinden ilk çalıştırma.
 - `docs/HARDWARE.md`: pin planı ve doğrulanan kütüphaneler.
 - `Dockerfile`, `compose.yaml`: VPS/Coolify dağıtımı. Hesap oturumları bilgisayarda kalır.
 
@@ -46,7 +47,7 @@ Mevcut status line varsa önce yedekle/birleştir. Yardımcı bu ayarı otomatik
 
 [Numaralı breadboard çizimleri](docs/BREADBOARD.md), [adım adım devre rehberi](docs/ASSEMBLY.md) ve [pin planı](docs/HARDWARE.md). `config.example.h` dosyasını `config.h` olarak kopyala. Panel sürücüsü üretici sayfasına göre V2/SSD1681 varsayımıdır; **rev2.1** taşıyıcı kart yazısı tek başına kesin panel kimliği değildir. Üreticinin tek ekran örneğiyle doğrula.
 
-İlk kurulum USB-C güç ve Wi-Fi veri kullanır. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. Temel firmware ve ADXL345/LED/hareket/buton seçenekleri açık sürüm Nano ESP32 için başarıyla derlendi. Yükleme, panel kimliği ve gerçek donanım testi henüz yapılmadı.
+İlk kurulumda [USB üzerinden veri aktarımı](docs/USB.md) veya Wi-Fi kullanılabilir; kart USB-C ile beslenir. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. 9 Ekim 2026'da iki ekran ve A0 LED seçenekli USB sürümü Arduino IDE'den gerçek Nano ESP32'ye başarıyla yüklendi. Nano gerçek Codex limit çerçevelerini USB üzerinden aldığını doğruladı. Panel görüntüsü ve LED'in fiziksel çalışması kullanıcıdan doğrulama bekliyor; ADXL345 bağlı olmadığı için kapalı. USB ve Wi-Fi sürümleri derlendi, 18 köprü/USB testi geçti. Gerçek Claude verisi henüz gelmedi.
 
 ## VPS
 

@@ -57,4 +57,12 @@ Her göz kendi kapasitesine tepki verir: %20'nin üzerinde açık göz, %1–20 
 
 ## Güç
 
-İlk prototip USB-C ile beslenecek. Veri Wi-Fi üzerinden gelir. Kablosuz veri bağlantısı cihazı elektrik açısından kablosuz yapmaz; pil, şarj devresi ve düşük güç ayarları ikinci aşamadır.
+İlk prototip USB-C ile beslenir. Veri [USB modunda](USB.md) aynı kablodan, Wi-Fi modunda ağdan gelir. Kablosuz veri bağlantısı cihazı elektrik açısından kablosuz yapmaz; pil, şarj devresi ve düşük güç ayarları ikinci aşamadır.
+
+## Gerçek karta yükleme — 9 Ekim 2026
+
+Arduino IDE 2.3.10'a Arduino ESP32 Boards 2.0.18-arduino.5 kuruldu; kart Arduino Nano ESP32, Arduino pin numaraları ve Normal/TinyUSB modu seçildi. GxEPD2 1.6.9, GFX 1.12.6, BusIO 1.17.4 ve ArduinoJson 7.4.3 ile iki ekran, LED=A0, ADXL345/hareket/buton kapalı USB sürümü DFU üzerinden başarıyla yüklendi (`Download done`, `No error condition`, `Done!`). Yerel config.h USB modundadır; Git'e alınmaz.
+
+Nano gerçek Codex verisi için ardışık `ack` mesajları döndürdü. Sonraki tam yenileme çağrıları seri günlükte görüldü; bu görüntünün ekranda oluştuğunun kanıtı değildir. Kısa USB kopmasından sonra yardımcı yeniden başlatılıp aktarım tekrar doğrulandı; yardımcı artık aynı port için otomatik yeniden bağlantı dener. Fiziksel ekran görüntüsü/LED ve panel kimliği kullanıcı doğrulaması bekliyor.
+
+USB sürümü CLI derlemesinde 420337 byte flash / 41360 byte RAM; Wi-Fi sürümü 989449 byte flash / 68180 byte RAM kullandı. 18 köprü ve seri port testi geçti. Gerçek Claude Code penceresi henüz alınmadı.

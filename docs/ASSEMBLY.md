@@ -132,4 +132,4 @@ Nano internete doğrudan Wi-Fi ile erişir; Codex/Claude hesap verisini Mac yard
 | ADXL verisi yok | SDA/SCL, CS/SDO seçimi, 0x53/0x1D, kütüphaneler |
 | Sensörlü sürüm sürekli uyuyor | PIR ısınması, OUT seviyesi, model, doğru A1 ayarı |
 
-Firmware’in derlenmesi doğrulandı; bu rehberdeki kablolama henüz gerçek cihaz üzerinde uygulanıp ölçülmedi. İlk tek ekran çıktısını gördükten sonra panel, sensör eşikleri ve kasa yerleşimini kesinleştireceğiz.
+9 Ekim 2026'da iki ekran/LED için [USB sürümü](USB.md) gerçek Nano ESP32'ye yüklendi ve kartın Codex verisini aldığı doğrulandı. Görüntünün camda oluşması, LED ve elektriksel bağlantıların ölçümü henüz kullanıcı tarafından doğrulanmadı; ADXL345 bağlı olmadığı için kapalı. Panel, sensör eşikleri ve kasa yerleşimi fiziksel çıktı doğrulandıktan sonra kesinleşecek.

@@ -8,6 +8,9 @@
 #include <SPI.h>
 #include <time.h>
 #include "config.h"
+#ifndef LYMYT_USB_SERIAL
+#define LYMYT_USB_SERIAL false
+#endif
 #if LYMYT_USE_ADXL345
 #include <Wire.h>
 #include <Adafruit_ADXL345_U.h>
@@ -45,6 +48,41 @@ float accelX = 0, accelY = 0, accelZ = 0;
 uint32_t lastSensorRead = 0, lastPresence = 0, lastShake = 0;
 uint32_t interactionUntil = 0;
 int tiltGaze = 0;
+String serialFrame;
+bool droppingSerialFrame = false;
+uint32_t lastUsbHello = 0;
+
+bool applyStatus(JsonDocument& document);
+
+void readUsb() {
+  if (!LYMYT_USB_SERIAL) return;
+  // Bounded, non-blocking newline frames. Debug output is only host-bound.
+  while (Serial.available()) {
+    char ch = Serial.read();
+    if (ch == '\n') {
+      if (!droppingSerialFrame && serialFrame.length()) {
+        JsonDocument document;
+        if (!deserializeJson(document, serialFrame) && applyStatus(document)) {
+          Serial.print("{\"lymyt\":\"ack\",\"generated_at\":");
+          Serial.print(epochBase);
+          Serial.print(",\"view\":\"");
+          Serial.print(weekly ? "week" : "short");
+          Serial.println("\"}");
+        }
+      }
+      serialFrame = ""; droppingSerialFrame = false;
+    } else if (ch != '\r' && !droppingSerialFrame) {
+      if (serialFrame.length() >= 8192) {
+        serialFrame = ""; droppingSerialFrame = true;
+      } else serialFrame += ch;
+    }
+  }
+  if (millis() - lastUsbHello >= 5000 && !linked) {
+    Serial.println("{\"lymyt\":\"ready\",\"transport\":\"usb\"}");
+    lastUsbHello = millis();
+  }
+  if (linked && millis() - lastPoll > 45000) linked = false;
+}
 
 bool beginHttp(HTTPClient& http, WiFiClient& plain, WiFiClientSecure& secure, const String& url) {
   if (url.startsWith("https://")) {
@@ -137,6 +175,22 @@ bool renewed(const Provider& before, const Provider& after) {
       && current.resetAt > previous.resetAt;
 }
 
+bool applyStatus(JsonDocument& document) {
+  if (!document["schema_version"].is<int>() || document["schema_version"].as<int>() != 1
+      || !document["generated_at"].is<uint32_t>()
+      || !document["providers"]["openai"].is<JsonObject>()
+      || !document["providers"]["claude"].is<JsonObject>()) return false;
+  Provider incoming[] = {
+    parseProvider(document["providers"]["openai"].as<JsonObjectConst>()),
+    parseProvider(document["providers"]["claude"].as<JsonObjectConst>())
+  };
+  if (renewed(providers[0], incoming[0]) || renewed(providers[1], incoming[1])) sparkleUntil = millis() + 12000;
+  providers[0] = incoming[0]; providers[1] = incoming[1];
+  epochBase = document["generated_at"].as<uint32_t>();
+  epochMillis = millis(); lastPoll = millis(); linked = true;
+  return true;
+}
+
 void pollBridge() {
   lastPoll = millis();
   if (WiFi.status() != WL_CONNECTED) { linked = false; return; }
@@ -150,19 +204,7 @@ void pollBridge() {
   if (code == 200) {
     JsonDocument document;
     DeserializationError error = deserializeJson(document, http.getString());
-    if (!error && document["schema_version"] == 1
-        && document["generated_at"].is<uint32_t>()
-        && document["providers"]["openai"].is<JsonObject>()
-        && document["providers"]["claude"].is<JsonObject>()) {
-      Provider incoming[] = {
-        parseProvider(document["providers"]["openai"].as<JsonObjectConst>()),
-        parseProvider(document["providers"]["claude"].as<JsonObjectConst>())
-      };
-      if (renewed(providers[0], incoming[0]) || renewed(providers[1], incoming[1])) sparkleUntil = millis() + 12000;
-      providers[0] = incoming[0]; providers[1] = incoming[1];
-      epochBase = document["generated_at"].as<uint32_t>();
-      epochMillis = millis(); linked = true;
-    } else linked = false;
+    linked = !error && applyStatus(document);
   } else linked = false;
   http.end();
   sendTelemetry();
@@ -248,6 +290,7 @@ void updateButton() {
 
 void setup() {
   Serial.begin(115200);
+  serialFrame.reserve(2048);
   pinMode(D10, OUTPUT); digitalWrite(D10, HIGH);
   pinMode(D6, OUTPUT); digitalWrite(D6, HIGH);
   if (LYMYT_LED_PIN >= 0) pinMode(LYMYT_LED_PIN, OUTPUT);
@@ -262,23 +305,28 @@ void setup() {
   SPI.begin();  // Nano ESP32 default: SCK=D13, MOSI=D11, MISO=D12 (unused).
   leftEye.init(115200, true, 2, false);
   if (LYMYT_RIGHT_EYE_ENABLED) rightEye.init(115200, true, 2, false);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(LYMYT_WIFI_SSID, LYMYT_WIFI_PASSWORD);
+  if (LYMYT_USB_SERIAL) {
+    Serial.println("{\"lymyt\":\"ready\",\"transport\":\"usb\"}");
+  } else {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(LYMYT_WIFI_SSID, LYMYT_WIFI_PASSWORD);
+  }
   lastConnect = millis();
 }
 
 void loop() {
-  readSensors(); updateButton(); updateLight();
-  if (!ntpStarted && WiFi.status() == WL_CONNECTED && String(LYMYT_BRIDGE_URL).startsWith("https://")) {
+  readSensors(); updateButton(); readUsb(); updateLight();
+  if (!LYMYT_USB_SERIAL && !ntpStarted && WiFi.status() == WL_CONNECTED && String(LYMYT_BRIDGE_URL).startsWith("https://")) {
     configTime(0, 0, "time.cloudflare.com", "pool.ntp.org");
     ntpStarted = true;
   }
-  if (WiFi.status() != WL_CONNECTED && millis() - lastConnect >= 30000) {
+  if (!LYMYT_USB_SERIAL && WiFi.status() != WL_CONNECTED && millis() - lastConnect >= 30000) {
     WiFi.reconnect(); lastConnect = millis();
   }
-  if (!lastPoll || millis() - lastPoll >= 15000) pollBridge();
+  if (!LYMYT_USB_SERIAL && (!lastPoll || millis() - lastPoll >= 15000)) pollBridge();
   const uint32_t interval = LYMYT_PARTIAL_REFRESH ? 60000 : 180000;
-  if (firstFrame || millis() - lastDraw >= interval) {
+  bool readyForFirstFrame = !LYMYT_USB_SERIAL || linked || millis() >= 30000;
+  if ((firstFrame && readyForFirstFrame) || (!firstFrame && millis() - lastDraw >= interval)) {
     bool full = firstFrame || !LYMYT_PARTIAL_REFRESH || refreshCount >= 5;
     drawEye(leftEye, providers[0], "CODEX", full, 5);
     if (LYMYT_RIGHT_EYE_ENABLED) drawEye(rightEye, providers[1], "CLAUDE", full, -5);

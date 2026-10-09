@@ -20,6 +20,140 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ROOT = Path(__file__).resolve().parent.parent
 
 
+class SerialLink:
+    """USB CDC on macOS/Linux; no Wi-Fi secret or third-party serial library."""
+    def __init__(self, port):
+        import fcntl
+        import termios
+        import tty
+        if not port.startswith('/dev/'):
+            raise ValueError('USB port must be a /dev/ serial device')
+        self.fd = os.open(port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+        self.original = None
+        self.buffer = bytearray()
+        self.dropping = False
+        try:
+            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.original = termios.tcgetattr(self.fd)
+            tty.setraw(self.fd)
+            attrs = termios.tcgetattr(self.fd)
+            attrs[4] = attrs[5] = termios.B115200
+            attrs[2] |= termios.CLOCAL | termios.CREAD
+            termios.tcsetattr(self.fd, termios.TCSANOW, attrs)
+            termios.tcflush(self.fd, termios.TCIOFLUSH)
+        except Exception as error:
+            self.close()
+            raise RuntimeError('USB configuration failed: ' + str(error)) from error
+
+    def close(self):
+        import termios
+        if self.fd is not None:
+            try:
+                if self.original is not None:
+                    termios.tcsetattr(self.fd, termios.TCSANOW, self.original)
+            except (OSError, termios.error):
+                pass
+            os.close(self.fd)
+            self.fd = None
+
+    def send(self, snapshot):
+        import select
+        payload = json.dumps(snapshot, allow_nan=False, separators=(',', ':')).encode() + b'\n'
+        if len(payload) > 8192:
+            raise ValueError('USB snapshot too large')
+        pending = memoryview(payload)
+        deadline = time.monotonic() + 3
+        while pending:
+            if time.monotonic() >= deadline:
+                raise TimeoutError('USB write timed out')
+            if select.select([], [self.fd], [], 0.2)[1]:
+                try:
+                    pending = pending[os.write(self.fd, pending):]
+                except BlockingIOError:
+                    pass
+
+    def lines(self, timeout=0.5):
+        import select
+        if not select.select([self.fd], [], [], timeout)[0]:
+            return []
+        chunk = os.read(self.fd, 4096)
+        if not chunk:
+            raise OSError('USB device disconnected')
+        lines = []
+        for ch in chunk:
+            if ch == 10:
+                if not self.dropping and self.buffer:
+                    lines.append(self.buffer.decode('utf-8', errors='replace').rstrip('\r'))
+                self.buffer.clear()
+                self.dropping = False
+            elif not self.dropping:
+                if len(self.buffer) >= 8192:
+                    self.buffer.clear()
+                    self.dropping = True
+                else:
+                    self.buffer.append(ch)
+        return lines
+
+
+def usb_snapshots(bridge, link):
+    started = time.monotonic()
+    last_send = 0
+    expected_epoch = None
+    last_ack = None
+    try:
+        while not bridge.stop.is_set():
+            now = time.monotonic()
+            if not last_send or now - last_send >= 15:
+                snapshot = bridge.snapshot()
+                # Let the first account read complete before the panel's first refresh.
+                awaiting_codex = (not bridge.args.no_codex and not snapshot['providers']['openai']['windows']
+                                  and now - started < 10)
+                if not awaiting_codex:
+                    link.send(snapshot)
+                    expected_epoch = snapshot['generated_at']
+                    last_send = now
+            for line in link.lines():
+                try:
+                    message = json.loads(line)
+                except ValueError:
+                    print('USB panel: ' + line[:240], flush=True)
+                    continue
+                if not isinstance(message, dict):
+                    continue
+                if message.get('lymyt') == 'ready':
+                    print('Lymyt USB firmware ready.', flush=True)
+                if (expected_epoch is not None and message.get('lymyt') == 'ack'
+                        and message.get('generated_at') == expected_epoch):
+                    with bridge.lock:
+                        bridge.device = {'last_seen': int(time.time()), 'motion': None,
+                                         'acceleration': None, 'transport': 'usb',
+                                         'view': 'week' if message.get('view') == 'week' else 'short'}
+                    if last_ack != expected_epoch:
+                        print('USB quota frame acknowledged: ' + str(expected_epoch), flush=True)
+                        last_ack = expected_epoch
+    except (OSError, ValueError, TimeoutError) as error:
+        print('Lymyt USB stopped: ' + str(error), file=sys.stderr, flush=True)
+    finally:
+        link.close()
+
+
+def maintain_usb(bridge, port, link):
+    """Reconnect only the explicitly selected device path after unplug/reboot."""
+    while not bridge.stop.is_set():
+        if link is None:
+            try:
+                link = SerialLink(port)
+                print('Lymyt USB reconnected: ' + port, flush=True)
+            except (OSError, ValueError, RuntimeError):
+                bridge.stop.wait(3)
+                continue
+        usb_snapshots(bridge, link)
+        link = None
+        bridge.stop.wait(3)
+    if link is not None:
+        link.close()
+
+
 def number(value, low=0, high=None):
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
@@ -349,9 +483,21 @@ def serve(args):
             pass
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
+    serial_link = None
+    try:
+        if args.serial_port:
+            serial_link = SerialLink(args.serial_port)
+    except (OSError, ValueError, ImportError, RuntimeError) as error:
+        server.server_close()
+        raise RuntimeError('Cannot open USB serial port: ' + str(error)) from error
     worker = threading.Thread(target=bridge.poll_codex, daemon=True)
     if not args.no_codex and not args.relay:
         worker.start()
+    serial_worker = None
+    if serial_link:
+        serial_worker = threading.Thread(target=maintain_usb, args=(bridge, args.serial_port, serial_link), daemon=True)
+        serial_worker.start()
+        print('Lymyt USB: ' + args.serial_port, flush=True)
     uploader = None
     if args.sync_url:
         uploader = threading.Thread(target=push_snapshots, args=(bridge,), daemon=True)
@@ -365,6 +511,8 @@ def serve(args):
     finally:
         bridge.stop.set()
         server.server_close()
+        if serial_worker:
+            serial_worker.join(timeout=5)
         if worker.is_alive():
             worker.join(timeout=25)
         if uploader:
@@ -405,6 +553,7 @@ def main():
     run.add_argument("--relay", action="store_true", help="VPS mode: receive sanitized quotas, no account login")
     run.add_argument("--sync-url", help="HTTPS VPS /v1/ingest endpoint")
     run.add_argument("--sync-token-file", type=Path, help="File containing the VPS sync token")
+    run.add_argument("--serial-port", help="Send quotas to the Nano over USB CDC (macOS/Linux)")
     commands.add_parser("capture-claude", help="Read status line JSON from stdin")
     args = parser.parse_args()
     if args.command == "serve":
@@ -412,6 +561,8 @@ def main():
             parser.error("poll-seconds must be >=15 and stale-after >= poll-seconds")
         if args.sync_url and (not args.sync_url.startswith("https://") or not args.sync_token_file or args.relay):
             parser.error("sync-url requires HTTPS, sync-token-file and local mode")
+        if args.serial_port and (args.relay or os.name != 'posix'):
+            parser.error("serial-port requires local mode on macOS/Linux")
         serve(args)
     else:
         try:

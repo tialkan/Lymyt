@@ -1,6 +1,9 @@
 #pragma once
 
 // Copy to config.h. Never commit Wi-Fi passwords or the device token.
+// USB mode: bridge/lymyt.py serve --serial-port /dev/cu.usbmodem...
+// Uses the USB data cable; Wi-Fi credentials and HTTP token are unused.
+#define LYMYT_USB_SERIAL false
 #define LYMYT_WIFI_SSID "your-2.4GHz-WiFi"
 #define LYMYT_WIFI_PASSWORD "your-WiFi-password"
 #define LYMYT_BRIDGE_URL "http://192.168.1.10:8787/v1/status"
