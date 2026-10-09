@@ -4,7 +4,7 @@
 
 Test Wi-Fi veya kota verisi kullanmaz. Arduino pin adlarını kullanır; SCK=D13, MOSI=D11 açıkça seçilmiştir. SPI 1 MHz, reset darbesi 5 ms'dir; 5 ms, [Waveshare V2 örneğinde](https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54_V2/epd1in54_V2.cpp) kullanılan süredir. Sürücü hâlâ geçici `GxEPD2_154_D67` / SSD1681 seçimidir. **Rev2.1 taşıyıcı kart yazısı panel denetleyicisini belirlemez.**
 
-Her ekran ayrı CS ile tek seferlik test deseni alır: siyah üst şerit, LYMYT yazısı, LEFT/RIGHT, iki siyah daire. GxEPD2 ilk kullanımda ayrıca başlangıç temizliği yapar. Sürekli yenileme yoktur; aynı ekrana tekrar komut için 3 dakika beklenir. BUSY sadece giriş olarak okunur. Yenilemeden sonra BUSY kopuk olabileceği için besleme kapatma komutundan önce ayrıca 5 saniye beklenir. A0 üzerindeki mevcut dirençli LED iki saniyede bir 150 ms yanar.
+Her ekran ayrı CS ile tek seferlik test deseni alır: siyah üst şerit, LYMYT yazısı, LEFT/RIGHT, iki siyah daire. GxEPD2 ilk kullanımda ayrıca başlangıç temizliği yapar. Sürekli yenileme yoktur; aynı ekrana tekrar komut için 3 dakika beklenir. BUSY sadece giriş olarak okunur. Yenilemeden sonra BUSY kopuk olabileceği için besleme kapatma komutundan önce ayrıca 5 saniye beklenir. A0 üzerindeki mevcut dirençli LED iki saniyede bir 150 ms yanar. İkinci tanılama sürümünde Nano'nun dahili RGB LED'i de aynı ritimde mavi yanar; böylece header teması olmadan kartın çalıştığı optik olarak kontrol edilebilir. D13 ışığı SPI ile ortak olduğundan heartbeat için kullanılmaz. Kart üzerindeki ayrı yeşil güç LED'i sabit yanabilir.
 
 ## Gerçek ölçüm
 
@@ -38,6 +38,16 @@ Kablo rengini veya çizimdeki modül terminal sırasını değil, gerçek kart �
 
 Panelin arkasındaki model/V2 etiketi ve breadboard'u gösteren net bir fotoğraf, sürücü ve gerçek kablo sırasını doğrulamak için gereken sonraki bilgidir.
 
+## Fotoğrafta şüphe edilen header teması
+
+Kullanıcının IMG_3163.heic fotoğrafında Nano'nun kenar delikleri lehimsiz gibi görünüyor; bu aşamada lehim durumu kullanıcıdan henüz doğrulanmadı. Fotoğraftaki kablolar bazı pinleri kapattığından tüm bağlantılar kesin olarak izlenemedi. Harici LED'in yanmadığı kullanıcı tarafından bildirildi.
+
+Lehimsiz header'ın üstüne kartı oturtmak, breadboard ile Nano arasında güvenilir bağlantı sağlamaz. USB'nin çalışması ve yeşil güç ışığı yanması dış pinlerin bağlı olduğunu kanıtlamaz. Nano'nun header'ları gerçekten lehimsizse, yazılım değişikliği bu fiziksel teması düzeltmez.
+
+Lehimsiz kart için iki adet **1×15, 2.54 mm erkek header** gerekir. Uzun pinler breadboard'a doğru aşağı, kısa uçlar Nano'nun deliklerinden yukarı gelecek; siyah plastik çıtalar kartın altında kalacak şekilde yerleştirilir. USB ve ekran kabloları çıkarılır. İki çıta hizalanıp sabitlendikten sonra kısa pinler ile kartın metal pad'leri birleştirilerek toplam 30 ayrı lehim bağlantısı yapılır; yan yana pad'ler lehimle köprülenmez. Breadboard deliklerine havya değdirilmez. İlk kez lehim yapılıyorsa kartı bir elektronikçiye götürüp iki header'ı lehimletmek uygulanabilir bir seçenektir.
+
+Lehimden sonra önce Nano ve tek dirençli LED bağlanır. Dahili mavi ışıkla birlikte harici A0 LED'i de yanıp sönüyorsa, aynı [breadboard rehberinin](BREADBOARD.md) birinci aşamasıyla yalnız sol ekran eklenir ve `l` testi çalıştırılır. Kartın fotoğrafta USB'si aşağıda görünmesi kendi başına hata değildir; koordinatlar için Nano/breadboard yönü çizimdeki USB-yukarı görünüşle eşleştirilmelidir. Kablo renkleri ve örtülü yollar üzerinden pin ataması tahmin edilmez.
+
 ## Testi yeniden çalıştırma
 
 Kablo düzeltildikten sonra USB takılır. Normal kota köprüsü kapalı kalmalı. IDE Serial Monitor'de 115200 baud ile `s` gönder: BUSY seviyeleri/pin eşlemesi. Ardından `l` sol test, `r` sağ test. Görünür resim ve birkaç saniyelik normal BUSY davranışı birlikte kontrol edilir. `RESULT` mesajı tek başına başarı demek değildir.
@@ -47,6 +57,6 @@ arduino-cli compile -b arduino:esp32:nano_nora:PinNumbers=default firmware/Panel
 arduino-cli upload -b arduino:esp32:nano_nora:PinNumbers=default -p /dev/cu.usbmodemE8F60AD38D242 firmware/PanelCheck
 ```
 
-Nano ESP32, By Arduino pin, Normal/TinyUSB kullanılır. Gerçek derleme: 393297 byte flash, 41816 byte RAM; GxEPD2 1.6.9 / Arduino ESP32 Boards 2.0.18-arduino.5.
+Nano ESP32, By Arduino pin, Normal/TinyUSB kullanılır. İlk derleme: 393297 byte flash, 41816 byte RAM; dahili RGB heartbeat eklenen sürüm: 393401 byte flash, 41816 byte RAM. GxEPD2 1.6.9 / Arduino ESP32 Boards 2.0.18-arduino.5 kullanıldı. İkinci sürüm de gerçek Nano'ya hatasız yüklendi; dahili mavi ışığın gözle görülmesi kullanıcıdan bekleniyor.
 
 Görüntü doğrulandıktan sonra Serial Monitor kapatılır, `firmware/Lymyt` USB yapılandırması tekrar yüklenir ve [USB köprüsü](USB.md) yeniden başlatılır. Test yazılımı kota ACK'leri göndermez.

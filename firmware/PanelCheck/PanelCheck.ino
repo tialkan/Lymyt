@@ -86,6 +86,11 @@ void setup() {
   pinMode(D6, OUTPUT); digitalWrite(D6, HIGH);
   pinMode(D7, INPUT); pinMode(D3, INPUT);
   pinMode(A0, OUTPUT); digitalWrite(A0, LOW);
+  // Onboard RGB provides a visible heartbeat even with unsoldered headers.
+  // Nano ESP32 RGB channels are active LOW. D13 is reserved for SPI.
+  pinMode(LED_RED, OUTPUT); digitalWrite(LED_RED, HIGH);
+  pinMode(LED_GREEN, OUTPUT); digitalWrite(LED_GREEN, HIGH);
+  pinMode(LED_BLUE, OUTPUT); digitalWrite(LED_BLUE, HIGH);
   busyGpio[0] = (gpio_num_t)digitalPinToGPIONumber(D7);
   busyGpio[1] = (gpio_num_t)digitalPinToGPIONumber(D3);
   attachInterrupt(D7, leftBusyChanged, CHANGE);
@@ -98,7 +103,9 @@ void setup() {
 
 void loop() {
   // Slow heartbeat on the existing A0 LED; never use D13 (SPI clock).
-  digitalWrite(A0, millis() % 2000 < 150 ? HIGH : LOW);
+  bool pulse = millis() % 2000 < 150;
+  digitalWrite(A0, pulse ? HIGH : LOW);
+  digitalWrite(LED_BLUE, pulse ? LOW : HIGH);
   if (Serial.available()) {
     char command = Serial.read();
     if (command == 's') { Serial.println("PanelCheck ready: l=left r=right s=pins"); reportPins(); }

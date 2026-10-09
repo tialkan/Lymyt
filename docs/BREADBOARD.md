@@ -4,6 +4,8 @@
 
 ## Kartı yerleştir
 
+**Önce header bağlantısını kontrol et:** Nano'nun iki sıra 15 pini kartın metal deliklerine lehimli olmalıdır. Pinleri breadboard'a takıp Nano'yu üstlerine oturtmak yeterli değildir. USB üzerinden kartın çalışması bu bağlantıyı doğrulamaz. Harici LED ve ekranlar birlikte tepki vermiyorsa [header kontrolü ve tek ekran tanılaması](PANEL-CHECK.md#fotoğrafta-şüphe-edilen-header-teması) ile başla.
+
 USB-C **yukarıda**, bileşenler sana bakacak. Nano'nun sol 15 pini **c5–c19**, sağ 15 pini **g5–g19** deliklerine girer. Sol üst D13=c5, sol ikinci 3V3=c6; sağ üst D12=g5, sağ ikinci D11=g6. Orta boşluğu e/f arasında bırak. c–g pin sırası arası 0.6″ (15.24 mm); pinleri zorlayıp eğme. Kablolar solda a/b, sağda h/i/j boş deliklerine takılır.
 
 **a–e aynı numaralı sırada birbirine bağlıdır. f–j de kendi arasında bağlıdır.** Örneğin j7, g7'deki D10 ile bağlantılıdır; a7 ile bağlantılı değildir. Yan yana farklı numaralı sıralar birbirine bağlı değildir. Çizgilerin görsel kesişmesi bağlantı anlamına gelmez; yalnız belirtilen uçlar bağlanır.
