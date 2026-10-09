@@ -40,9 +40,9 @@ Panelin arkasındaki model/V2 etiketi ve breadboard'u gösteren net bir fotoğra
 
 ## Fotoğrafta şüphe edilen header teması
 
-Kullanıcının IMG_3163.heic fotoğrafında Nano'nun kenar delikleri lehimsiz gibi görünüyor; bu aşamada lehim durumu kullanıcıdan henüz doğrulanmadı. Fotoğraftaki kablolar bazı pinleri kapattığından tüm bağlantılar kesin olarak izlenemedi. Harici LED'in yanmadığı kullanıcı tarafından bildirildi.
+Kullanıcının IMG_3163.heic fotoğrafındaki şüphe doğrulandı: **kullanıcı Nano pinlerini lehimlemediğini ve dahili mavi ışığın yanıp söndüğünü bildirdi.** Böylece test yazılımının çalışması gözle doğrulandı; breadboard'a giden header teması ise henüz kurulmamış. Harici LED yanmıyor ve ekranlar beyaz. Fotoğraftaki kablolar bazı pinleri kapattığından tüm bağlantılar kesin olarak izlenemedi.
 
-Lehimsiz header'ın üstüne kartı oturtmak, breadboard ile Nano arasında güvenilir bağlantı sağlamaz. USB'nin çalışması ve yeşil güç ışığı yanması dış pinlerin bağlı olduğunu kanıtlamaz. Nano'nun header'ları gerçekten lehimsizse, yazılım değişikliği bu fiziksel teması düzeltmez.
+Lehimsiz header'ın üstüne kartı oturtmak, breadboard ile Nano arasında güvenilir bağlantı sağlamaz. USB'nin çalışması ve yeşil güç ışığı yanması dış pinlerin bağlı olduğunu kanıtlamaz. Sonraki gerekli adım iki header'ın Nano'ya lehimlenmesidir; yazılım değişikliği bu fiziksel teması düzeltmez. Panel sürücüsü ve kalan kablo planı ancak bu bağlantı düzeltildikten sonra doğrulanabilir.
 
 Lehimsiz kart için iki adet **1×15, 2.54 mm erkek header** gerekir. Uzun pinler breadboard'a doğru aşağı, kısa uçlar Nano'nun deliklerinden yukarı gelecek; siyah plastik çıtalar kartın altında kalacak şekilde yerleştirilir. USB ve ekran kabloları çıkarılır. İki çıta hizalanıp sabitlendikten sonra kısa pinler ile kartın metal pad'leri birleştirilerek toplam 30 ayrı lehim bağlantısı yapılır; yan yana pad'ler lehimle köprülenmez. Breadboard deliklerine havya değdirilmez. İlk kez lehim yapılıyorsa kartı bir elektronikçiye götürüp iki header'ı lehimletmek uygulanabilir bir seçenektir.
 
@@ -57,6 +57,6 @@ arduino-cli compile -b arduino:esp32:nano_nora:PinNumbers=default firmware/Panel
 arduino-cli upload -b arduino:esp32:nano_nora:PinNumbers=default -p /dev/cu.usbmodemE8F60AD38D242 firmware/PanelCheck
 ```
 
-Nano ESP32, By Arduino pin, Normal/TinyUSB kullanılır. İlk derleme: 393297 byte flash, 41816 byte RAM; dahili RGB heartbeat eklenen sürüm: 393401 byte flash, 41816 byte RAM. GxEPD2 1.6.9 / Arduino ESP32 Boards 2.0.18-arduino.5 kullanıldı. İkinci sürüm de gerçek Nano'ya hatasız yüklendi; dahili mavi ışığın gözle görülmesi kullanıcıdan bekleniyor.
+Nano ESP32, By Arduino pin, Normal/TinyUSB kullanılır. İlk derleme: 393297 byte flash, 41816 byte RAM; dahili RGB heartbeat eklenen sürüm: 393401 byte flash, 41816 byte RAM. GxEPD2 1.6.9 / Arduino ESP32 Boards 2.0.18-arduino.5 kullanıldı. İkinci sürüm de gerçek Nano'ya hatasız yüklendi; kullanıcı dahili mavi ışığın yanıp söndüğünü doğruladı.
 
 Görüntü doğrulandıktan sonra Serial Monitor kapatılır, `firmware/Lymyt` USB yapılandırması tekrar yüklenir ve [USB köprüsü](USB.md) yeniden başlatılır. Test yazılımı kota ACK'leri göndermez.
