@@ -1,0 +1,170 @@
+[
+  {
+    "id": 0,
+    "en": "arbitrary",
+    "tr": "keyfi",
+    "example": "The deadline seemed arbitrary.",
+    "level": "C1"
+  },
+  {
+    "id": 1,
+    "en": "articulate",
+    "tr": "açıkça ifade etmek",
+    "example": "She articulated her concerns clearly.",
+    "level": "C1"
+  },
+  {
+    "id": 2,
+    "en": "allocate",
+    "tr": "tahsis etmek",
+    "example": "We allocated more time to testing.",
+    "level": "C1"
+  },
+  {
+    "id": 3,
+    "en": "adverse",
+    "tr": "olumsuz",
+    "example": "The change had an adverse effect.",
+    "level": "C1"
+  },
+  {
+    "id": 4,
+    "en": "authentic",
+    "tr": "özgün; gerçek",
+    "example": "The museum verified the authentic document.",
+    "level": "C1"
+  },
+  {
+    "id": 5,
+    "en": "autonomy",
+    "tr": "özerklik",
+    "example": "The team needs greater autonomy.",
+    "level": "C1"
+  },
+  {
+    "id": 6,
+    "en": "benchmark",
+    "tr": "karşılaştırma ölçütü",
+    "example": "This result provides a useful benchmark.",
+    "level": "C1"
+  },
+  {
+    "id": 7,
+    "en": "boundary",
+    "tr": "sınır",
+    "example": "Set a clear boundary between work and rest.",
+    "level": "C1"
+  },
+  {
+    "id": 8,
+    "en": "breakthrough",
+    "tr": "önemli ilerleme",
+    "example": "The new method was a breakthrough.",
+    "level": "C1"
+  },
+  {
+    "id": 9,
+    "en": "accountability",
+    "tr": "hesap verebilirlik",
+    "example": "Public projects require accountability.",
+    "level": "C1"
+  },
+  {
+    "id": 10,
+    "en": "adhere",
+    "tr": "bağlı kalmak",
+    "example": "We adhere to the agreed schedule.",
+    "level": "C1"
+  },
+  {
+    "id": 11,
+    "en": "adjacent",
+    "tr": "bitişik",
+    "example": "The sensor sits adjacent to the screen.",
+    "level": "C1"
+  },
+  {
+    "id": 12,
+    "en": "advocate",
+    "tr": "savunmak",
+    "example": "They advocate better public transport.",
+    "level": "C1"
+  },
+  {
+    "id": 13,
+    "en": "analogy",
+    "tr": "benzetme",
+    "example": "This analogy makes the idea easier to understand.",
+    "level": "C1"
+  },
+  {
+    "id": 14,
+    "en": "aspiration",
+    "tr": "güçlü istek",
+    "example": "Her aspiration is to become a researcher.",
+    "level": "C1"
+  },
+  {
+    "id": 15,
+    "en": "assert",
+    "tr": "öne sürmek",
+    "example": "The author asserts that the method is reliable.",
+    "level": "C1"
+  },
+  {
+    "id": 16,
+    "en": "attain",
+    "tr": "ulaşmak",
+    "example": "Practice helps you attain your goals.",
+    "level": "C1"
+  },
+  {
+    "id": 17,
+    "en": "attribute",
+    "tr": "atfetmek",
+    "example": "They attribute the improvement to careful testing.",
+    "level": "C1"
+  },
+  {
+    "id": 18,
+    "en": "abundance",
+    "tr": "bolluk",
+    "example": "There is an abundance of useful data.",
+    "level": "C1"
+  },
+  {
+    "id": 19,
+    "en": "accumulate",
+    "tr": "biriktirmek",
+    "example": "Small improvements accumulate over time.",
+    "level": "C1"
+  },
+  {
+    "id": 20,
+    "en": "acquisition",
+    "tr": "edinim",
+    "example": "Language acquisition takes regular practice.",
+    "level": "C1"
+  },
+  {
+    "id": 21,
+    "en": "capability",
+    "tr": "yetenek",
+    "example": "The device has a new sensing capability.",
+    "level": "C1"
+  },
+  {
+    "id": 22,
+    "en": "align",
+    "tr": "uyumlu hâle getirmek",
+    "example": "Align the screen with the opening.",
+    "level": "C1"
+  },
+  {
+    "id": 23,
+    "en": "applicable",
+    "tr": "uygulanabilir",
+    "example": "The rule is applicable to this project.",
+    "level": "C1"
+  }
+]

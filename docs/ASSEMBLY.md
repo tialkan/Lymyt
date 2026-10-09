@@ -108,7 +108,7 @@ Sensörün modelini ve OUT voltajını bilmeden besleme bağlama. Bazı PIR kart
 
 Yeni hareket LED tepkisi verir. 5 dakika hareket görülmezse gözler bir sonraki yenilemede uyku ifadesine geçer. PIR hareketsiz oturan kişiyi sürekli algılamayabilir.
 
-İsteğe bağlı anlık buton: **D2 → buton → GND**, `LYMYT_BUTTON_PIN D2`. Dahili pull-up kullanılır. Kısa/haftalık görünümü değiştirir; ekrana bir sonraki yenilemede yansır. Dört bacaklı butonun aynı taraftaki bağlı bacaklarını kontrol et; butonu breadboard’un orta kanalı üstüne koy.
+İsteğe bağlı anlık buton: **D2 → buton → GND**, `LYMYT_BUTTON_PIN D2`. Dahili pull-up kullanılır. Limit → C1 kelime → öğrendim ve limit → sonraki kelime döngüsünü işletir. E-paper yenilemesi beklerken ek basışlar kelime atlamaz. Dört bacaklı butonun aynı taraftaki bağlı bacaklarını kontrol et; butonu breadboard’un orta kanalı üstüne koy.
 
 ## 9. Mac yerine internet üzerinden çalışma
 

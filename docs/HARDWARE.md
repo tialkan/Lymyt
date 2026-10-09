@@ -34,7 +34,7 @@ Bu plan 3.3 V uyumlu modül varsayar; kart üzerindeki besleme şartını doğru
 ## İsteğe bağlı ilk etkileşimler
 
 - Basit LED: A0 → 330 Ω seri direnç → LED anot; LED katot → GND. `LYMYT_LED_PIN A0` olarak ayarla. Köprüye bağlıyken yanar; gözlenen dolu limitin yeni pencereye geçtiği doğrulanınca 12 saniye kısa yanıp sönme yapar.
-- Buton: D2 → anlık buton → GND. `LYMYT_BUTTON_PIN D2` olarak ayarla. Kısa/haftalık pencereyi seçer; ekran seçimi bir sonraki izin verilen yenilemede gösterir.
+- Buton: D2 → anlık buton → GND. `LYMYT_BUTTON_PIN D2` olarak ayarla. Limit → C1 kelime → öğrendim ve limit → sonraki kelime. E-paper’da bir sonraki izin verilen yenilemede, OLED’de hızlı yansır.
 - A4/A5 daha sonra I²C sensörler için ayrılabilir. A1/A2/A3 diğer etkileşimler için boştur.
 
 Eldeki parçalar: 5 mm mavi LED'ler, ADXL345, hareket sensörü (modeli bekleniyor). Web anten ışığı mavi LED fikrini temsil eder; kasa henüz üretim çizimi değildir.

@@ -45,7 +45,7 @@
     if (remaining === null) meter.removeAttribute('aria-valuenow');
     else meter.setAttribute('aria-valuenow',remaining);
     meter.setAttribute('aria-valuetext',remaining === null ? 'Bilinmiyor' : `${remaining}% kaldı`);
-    get(`${key}-age`).textContent = demo ? 'Örnek veri · gerçek hesabına bağlı değil' : age === null ? 'Henüz veri alınmadı' : `Son gözlem ${duration(age).replace('Doğrulanıyor','0dk')} önce${stale ? ' · güncel olmayabilir' : ''}`;
+    get(`${key}-age`).textContent = demo ? 'Örnek veri · gerçek hesabına bağlı değil' : age === null ? 'Henüz veri alınmadı' : `Son gözlem ${duration(age).replace('Doğrulanıyor','0dk')} önce${stale ? ' · güncel olmayabilir' : ''}${provider?.source === 'claude-browser-manual' ? ' · tarayıcıdan elle alındı; otomatik yenilenmez' : ''}`;
   }
   function draw() {
     if (!snapshot) return;

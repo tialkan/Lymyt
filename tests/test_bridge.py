@@ -9,6 +9,8 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+from unittest.mock import patch
+import io
 
 ROOT = Path(__file__).resolve().parent.parent
 spec = importlib.util.spec_from_file_location("lymyt", ROOT / "bridge" / "lymyt.py")
@@ -17,6 +19,24 @@ spec.loader.exec_module(lymyt)
 
 
 class QuotaSemantics(unittest.TestCase):
+    def test_cached_statusline_does_not_renew_observation_and_empty_does_not_erase(self):
+        with tempfile.TemporaryDirectory() as directory:
+            sample = {"session_id": "not-saved", "cost": {"total_api_duration_ms": 10},
+                      "rate_limits": {"five_hour": {"used_percentage": 40, "resets_at": 9000}}}
+            def capture(payload, now):
+                with patch.object(sys, "argv", ["lymyt", "--data-dir", directory, "capture-claude"]), \
+                     patch.object(sys, "stdin", io.StringIO(json.dumps(payload))), \
+                     patch.object(sys, "stdout", io.StringIO()), patch.object(lymyt.time, "time", return_value=now):
+                    self.assertEqual(lymyt.main(), 0)
+                return json.loads((Path(directory)/"claude.json").read_text())
+            first = capture(sample, 1000)
+            cached = capture(sample, 1600)
+            self.assertEqual(cached["observed_at"], 1000)
+            self.assertEqual(capture({}, 1700), first)
+            self.assertNotIn("not-saved", json.dumps(first))
+            sample["cost"]["total_api_duration_ms"] = 20
+            self.assertEqual(capture(sample, 1800)["observed_at"], 1800)
+
     def test_multi_bucket_does_not_use_another_product(self):
         result = lymyt.normalize_codex({"rateLimitsByLimitId": {"other": {"primary": {
             "usedPercent": 40, "resetsAt": 1000}}}, "rateLimits": {"primary": {

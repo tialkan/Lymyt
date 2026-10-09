@@ -4,10 +4,22 @@
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
-#include <GxEPD2_BW.h>
 #include <SPI.h>
 #include <time.h>
 #include "config.h"
+#include <Preferences.h>
+#include <U8g2_for_Adafruit_GFX.h>
+#include "Words.h"
+#include "Learning.h"
+#ifndef LYMYT_OLED
+#define LYMYT_OLED false
+#endif
+#if LYMYT_OLED
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
+#else
+#include <GxEPD2_BW.h>
+#endif
 #ifndef LYMYT_USB_SERIAL
 #define LYMYT_USB_SERIAL false
 #endif
@@ -17,10 +29,21 @@
 Adafruit_ADXL345_Unified accelerometer(345);
 #endif
 
+#if LYMYT_OLED
+using EyeDisplay = Adafruit_SSD1306;
+TwoWire rightBus(1);
+EyeDisplay leftEye(128, 64, &Wire, -1);
+EyeDisplay rightEye(128, 64, &rightBus, -1);
+#else
 using Panel = LYMYT_PANEL_CLASS;
 using EyeDisplay = GxEPD2_BW<Panel, Panel::HEIGHT>;
-EyeDisplay leftEye(Panel(D10, D9, D8, D7));  // CS, DC, RST, BUSY
+EyeDisplay leftEye(Panel(D10, D9, D8, D7));
 EyeDisplay rightEye(Panel(D6, D5, D4, D3));
+#endif
+U8G2_FOR_ADAFRUIT_GFX utf8;
+Learning learning;
+Preferences progress;
+bool progressReady = false, displaysReady = true;
 
 struct LimitWindow {
   bool present = false;
@@ -66,7 +89,7 @@ void readUsb() {
           Serial.print("{\"lymyt\":\"ack\",\"generated_at\":");
           Serial.print(epochBase);
           Serial.print(",\"view\":\"");
-          Serial.print(weekly ? "week" : "short");
+          Serial.print(learning.words ? "words" : (weekly ? "week" : "short"));
           Serial.println("\"}");
         }
       }
@@ -104,7 +127,7 @@ void sendTelemetry() {
   http.setConnectTimeout(3000); http.setTimeout(3000);
   if (!beginHttp(http, plain, secure, endpoint)) return;
   JsonDocument data;
-  data["view"] = weekly ? "week" : "short";
+  data["view"] = learning.words ? "words" : (weekly ? "week" : "short");
   if (LYMYT_MOTION_PIN >= 0) data["motion"] = motion;
   if (accelerometerReady) {
     data["acceleration"]["x"] = accelX;
@@ -232,47 +255,80 @@ void centered(EyeDisplay& display, const String& text, int y, uint8_t size) {
   display.print(text);
 }
 
-void drawEye(EyeDisplay& display, const Provider& provider, const char* label, bool full, int gaze) {
+void utf8Center(EyeDisplay& display, const String& text, int y) {
+  int x = max(2, (display.width() - (int)utf8.getUTF8Width(text.c_str())) / 2);
+  utf8.setCursor(x, y); utf8.print(text);
+}
+
+void wordLines(EyeDisplay& display, const char* value) {
+  String line, input(value);
+  int y = LYMYT_OLED ? 27 : 85;
+  int maxWidth = display.width() - 12;
+  // Word wrapping preserves UTF-8 code points and measures actual glyph widths.
+  while (input.length()) {
+    int space = input.indexOf(' ');
+    String token = space < 0 ? input : input.substring(0, space);
+    input = space < 0 ? "" : input.substring(space + 1);
+    String next = line.length() ? line + " " + token : token;
+    if (utf8.getUTF8Width(next.c_str()) > maxWidth && line.length()) {
+      utf8Center(display, line, y); y += 17; line = token;
+    } else line = next;
+  }
+  utf8Center(display, line, y);
+}
+
+void drawEye(EyeDisplay& display, const Provider& provider, const char* label, bool full, int gaze, bool isRight) {
   const LimitWindow& selected = weekly ? provider.weekWindow : provider.shortWindow;
   uint32_t now = clockNow();
   bool fresh = providerFresh(provider, now);
   int capacity = selected.used < 0 ? -1 : roundf(100 - selected.used);
-  bool napping = LYMYT_MOTION_PIN >= 0 && millis() - lastPresence >= 300000;
-  gaze += tiltGaze;
+#if !LYMYT_OLED
   if (full) display.setFullWindow();
   else display.setPartialWindow(0, 0, display.width(), display.height());
   display.firstPage();
+#endif
   do {
-    display.fillScreen(GxEPD_WHITE);
-    display.setTextColor(GxEPD_BLACK);
-    centered(display, String(label) + (weekly ? " 7D" : ""), 12, 2);
-    if (!fresh || capacity < 0) {
-      display.fillCircle(100, 89, 12, GxEPD_BLACK);
-    } else if (capacity == 0 || napping) {
-      display.fillRoundRect(54, 92, 92, 8, 4, GxEPD_BLACK);
-    } else if (capacity <= 20) {
-      display.fillRoundRect(67 + gaze, 77, 64, 40, 17, GxEPD_BLACK);
-      display.fillRect(67 + gaze, 76, 64, 11, GxEPD_WHITE);
-      display.fillCircle(83 + gaze, 93, 5, GxEPD_WHITE);
+    // Adafruit OLED uses black=0/white=1; e-paper uses the inverse.
+    const uint16_t ink = LYMYT_OLED ? 1 : 0, paper = LYMYT_OLED ? 0 : 1;
+    display.fillScreen(paper); display.setTextColor(ink);
+    utf8.begin(display); utf8.setFont(u8g2_font_unifont_t_extended);
+    utf8.setForegroundColor(ink); utf8.setBackgroundColor(paper); utf8.setFontMode(1);
+    if (learning.words) {
+      display.setTextSize(1); display.setCursor(5, 2);
+      display.print(isRight ? "TR / C1" : "EN / C1");
+      wordLines(display, isRight ? WORDS[learning.index].tr : WORDS[learning.index].en);
+      display.setTextSize(1); display.setCursor(5, display.height() - 10);
+      display.print(String(learning.index + 1) + "/" + String(WORD_COUNT));
     } else {
-      display.fillRoundRect(67 + gaze, 49, 64, 81, 29, GxEPD_BLACK);
-      display.fillCircle(83 + gaze, 68, 8, GxEPD_WHITE);
-      display.fillCircle(112 + gaze, 112, 3, GxEPD_WHITE);
+      centered(display, String(label) + (weekly ? " 7D" : ""), LYMYT_OLED ? 0 : 12, LYMYT_OLED ? 1 : 2);
+      int cx = display.width()/2 + gaze + tiltGaze;
+      int cy = LYMYT_OLED ? 23 : 89;
+      bool napping = LYMYT_MOTION_PIN >= 0 && millis() - lastPresence >= 300000;
+      if (!fresh || capacity < 0) display.fillCircle(cx, cy, LYMYT_OLED ? 4 : 12, ink);
+      else if (capacity == 0 || napping) display.fillRoundRect(cx-(LYMYT_OLED?15:46),cy,LYMYT_OLED?30:92,LYMYT_OLED?3:8,2,ink);
+      else {
+        int w = LYMYT_OLED ? 17 : 64, h = LYMYT_OLED ? 18 : (capacity <= 20 ? 40 : 81);
+        display.fillRoundRect(cx-w/2,cy-h/2,w,h,LYMYT_OLED?7:17,ink);
+        display.fillCircle(cx-w/5,cy-h/4,LYMYT_OLED?2:7,paper);
+      }
+      centered(display, capacity < 0 ? "VERI YOK" : String(capacity) + "% KALDI", LYMYT_OLED ? 37 : 146, LYMYT_OLED ? 1 : 2);
+      centered(display, remainingTime(selected.resetAt, now), LYMYT_OLED ? 49 : 169, LYMYT_OLED ? 1 : 2);
+      if (!fresh && capacity >= 0) centered(display, "SON BILINEN", LYMYT_OLED ? 57 : 190, 1);
     }
-    String percent = capacity < 0 ? "VERI YOK" : String(capacity) + "% KALDI";
-    centered(display, percent, 146, 2);
-    centered(display, remainingTime(selected.resetAt, now), 169, 2);
-    if (!fresh && capacity >= 0) centered(display, "SON BILINEN", 190, 1);
+#if LYMYT_OLED
+    display.display();
+  } while (false);
+#else
   } while (display.nextPage());
-  // Turn off the panel high-voltage supply between refreshes.
   display.epd2.powerOff();
+#endif
 }
 
 void updateLight() {
   if (LYMYT_LED_PIN < 0) return;
   bool celebrate = (int32_t)(sparkleUntil - millis()) > 0;
   bool responding = (int32_t)(interactionUntil - millis()) > 0;
-  bool on = celebrate ? (millis() / 180) % 2 : responding ? (millis() / 400) % 2 : linked;
+  bool on = learning.pending ? (millis() / 250) % 2 : celebrate ? (millis() / 180) % 2 : responding ? (millis() / 400) % 2 : linked;
   digitalWrite(LYMYT_LED_PIN, on ? HIGH : LOW);
 }
 
@@ -281,9 +337,16 @@ void updateButton() {
   bool pressed = digitalRead(LYMYT_BUTTON_PIN) == LOW;
   if (pressed && !previousPress) { pressStarted = millis(); pressHandled = false; }
   if (pressed && !pressHandled && millis() - pressStarted >= 40) {
-    weekly = !weekly; pressHandled = true;
-    // Selection appears at the next permitted refresh, preserving the panel cadence.
-    Serial.println(weekly ? "Weekly view selected" : "Short window selected");
+    pressHandled = true;
+    uint32_t previousLearned = learning.learned;
+    if (learning.press(WORD_COUNT)) {
+      interactionUntil = millis() + 1500;
+      if (progressReady && learning.learned != previousLearned) {
+        progress.putUInt("learned", learning.learned);
+        progress.putUChar("index", learning.index);
+      }
+      Serial.println(learning.words ? "Word view queued" : "Limit view queued");
+    }
   }
   previousPress = pressed;
 }
@@ -302,9 +365,23 @@ void setup() {
   if (accelerometerReady) accelerometer.setRange(ADXL345_RANGE_4_G);
 #endif
   lastPresence = millis();
-  SPI.begin();  // Nano ESP32 default: SCK=D13, MOSI=D11, MISO=D12 (unused).
-  leftEye.init(115200, true, 2, false);
-  if (LYMYT_RIGHT_EYE_ENABLED) rightEye.init(115200, true, 2, false);
+  progressReady = progress.begin("lymyt-c1", false);
+  if (progressReady) {
+    learning.index = progress.getUChar("index", 0) % WORD_COUNT;
+    learning.learned = progress.getUInt("learned", 0);
+  }
+#if LYMYT_OLED
+  // Separate hardware buses allow two modules with the same 0x3C address.
+  Wire.begin(A4, A5);
+  rightBus.begin(A2, A3);
+  displaysReady = leftEye.begin(SSD1306_SWITCHCAPVCC, 0x3C, true, false);
+  if (LYMYT_RIGHT_EYE_ENABLED) displaysReady = rightEye.begin(SSD1306_SWITCHCAPVCC, 0x3C, true, false) && displaysReady;
+#else
+  SPI.begin();
+  leftEye.init(115200, true, 5, false);
+  if (LYMYT_RIGHT_EYE_ENABLED) rightEye.init(115200, true, 5, false);
+#endif
+  if (!displaysReady) Serial.println("Display initialization failed; check power/I2C address.");
   if (LYMYT_USB_SERIAL) {
     Serial.println("{\"lymyt\":\"ready\",\"transport\":\"usb\"}");
   } else {
@@ -324,13 +401,14 @@ void loop() {
     WiFi.reconnect(); lastConnect = millis();
   }
   if (!LYMYT_USB_SERIAL && (!lastPoll || millis() - lastPoll >= 15000)) pollBridge();
-  const uint32_t interval = LYMYT_PARTIAL_REFRESH ? 60000 : 180000;
+  const uint32_t interval = LYMYT_OLED ? (learning.pending ? 50 : 1000) : (LYMYT_PARTIAL_REFRESH ? 60000 : 180000);
   bool readyForFirstFrame = !LYMYT_USB_SERIAL || linked || millis() >= 30000;
-  if ((firstFrame && readyForFirstFrame) || (!firstFrame && millis() - lastDraw >= interval)) {
+  if (displaysReady && ((firstFrame && readyForFirstFrame) || (!firstFrame && millis() - lastDraw >= interval))) {
     bool full = firstFrame || !LYMYT_PARTIAL_REFRESH || refreshCount >= 5;
-    drawEye(leftEye, providers[0], "CODEX", full, 5);
-    if (LYMYT_RIGHT_EYE_ENABLED) drawEye(rightEye, providers[1], "CLAUDE", full, -5);
+    drawEye(leftEye, providers[0], "CODEX", full, 5, false);
+    if (LYMYT_RIGHT_EYE_ENABLED) drawEye(rightEye, providers[1], "CLAUDE", full, -5, true);
     refreshCount = full ? 0 : refreshCount + 1;
+    learning.displayed();
     firstFrame = false; lastDraw = millis();
   }
   delay(5);

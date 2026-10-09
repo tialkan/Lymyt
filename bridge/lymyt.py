@@ -2,6 +2,7 @@
 """Local, read-only Codex/Claude Code quota bridge; Python standard library only."""
 import argparse
 import hmac
+import hashlib
 import json
 import math
 import mimetypes
@@ -127,7 +128,7 @@ def usb_snapshots(bridge, link):
                     with bridge.lock:
                         bridge.device = {'last_seen': int(time.time()), 'motion': None,
                                          'acceleration': None, 'transport': 'usb',
-                                         'view': 'week' if message.get('view') == 'week' else 'short'}
+                                         'view': message.get('view') if message.get('view') in ('week', 'words') else 'short'}
                     if last_ack != expected_epoch:
                         print('USB quota frame acknowledged: ' + str(expected_epoch), flush=True)
                         last_ack = expected_epoch
@@ -203,7 +204,7 @@ def normalize_claude(data, now):
             item = window(key, rates.get(key), "used_percentage", "resets_at", duration)
             if item:
                 windows.append(item)
-    return {"product": "claude-code", "observed_at": now if windows else None,
+    return {"product": "claude-code", "source": "claude-code-statusline", "observed_at": now if windows else None,
             "windows": windows}
 
 
@@ -387,6 +388,8 @@ def clean_providers(payload):
                 parsed.append(item)
         result[key] = {"product": product, "observed_at": int(observed) if observed is not None else None,
                        "windows": parsed}
+        if key == "claude" and source.get("source") in ("claude-code-statusline", "claude-browser-manual"):
+            result[key]["source"] = source["source"]
     return result
 
 
@@ -469,7 +472,7 @@ def serve(args):
                     telemetry = {"last_seen": int(time.time()),
                                  "motion": payload.get("motion") if isinstance(payload.get("motion"), bool) else None,
                                  "acceleration": parsed_acceleration,
-                                 "view": "week" if payload.get("view") == "week" else "short"}
+                                 "view": payload.get("view") if payload.get("view") in ("week", "words") else "short"}
                     with bridge.lock:
                         bridge.device = telemetry
             except (ValueError, TypeError, OSError):
@@ -570,7 +573,22 @@ def main():
             if not isinstance(data, dict):
                 raise ValueError("Expected a JSON object")
             provider = normalize_claude(data, int(time.time()))
-            atomic_json(args.data_dir / "claude.json", provider)
+            # Unsupported plans/missing windows must not erase a previous observation.
+            if provider["windows"]:
+                # refreshInterval can rerun a cached statusline payload. A repeated
+                # observation must retain its original timestamp rather than become fresh.
+                cost = data.get("cost")
+                identity = {"windows": provider["windows"], "session": data.get("session_id"),
+                            "api_duration": cost.get("total_api_duration_ms") if isinstance(cost, dict) else None}
+                fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+                previous = {}
+                try:
+                    previous = json.loads((args.data_dir / "claude.json").read_text())
+                except (OSError, ValueError):
+                    pass
+                if previous.get("fingerprint") != fingerprint:
+                    provider["fingerprint"] = fingerprint
+                    atomic_json(args.data_dir / "claude.json", provider)
             values = ["{}: {:.0f}%".format(w["id"], w["used_percent"])
                       for w in provider["windows"] if w["used_percent"] is not None]
             print("Lymyt | " + (" · ".join(values) if values else "limit bilgisi bekleniyor"))
