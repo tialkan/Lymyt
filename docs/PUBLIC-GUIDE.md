@@ -5,8 +5,8 @@ Görsel rehber: https://tezatlas.com/lymyt
 ## İlk kurulum
 
 1. Nano ESP32 headerlarını lehimle. Güç kapalıyken tek ekranı bağla. Panel modeli ve sürücüsünü PanelCheck ile doğrula; carrier Rev2.1 yeterli kimlik değildir.
-2. Arduino IDE kartı Arduino Nano ESP32; numaralandırma By Arduino pin. ArduinoJson, Adafruit GFX ve U8g2_for_Adafruit_GFX kur. E-paper için GxEPD2; OLED için Adafruit SSD1306.
-3. firmware/Lymyt/config.example.h dosyasını aynı klasöre config.h olarak kopyala. USB varsayılan. E-paper: LYMYT_OLED false. 128×64 SSD1306 I2C: true. Buton bağlandıysa LYMYT_BUTTON_PIN D2; LED için A0. Bağlı olmayan sensörleri açma.
+2. Kart seçimi: Nano ESP32 için Arduino Nano ESP32 / By Arduino pin; klasik WROOM için esp32 by Espressif Systems / ESP32 Dev Module. WROOM bağlantıları docs/WROOM-ASSEMBLY.md içindedir. ArduinoJson, Adafruit GFX ve U8g2_for_Adafruit_GFX kur. E-paper için GxEPD2; OLED için Adafruit SSD1306.
+3. Nano için config.example.h, WROOM için config.wroom.example.h dosyasını aynı klasöre config.h olarak kopyala. USB varsayılan. E-paper: LYMYT_OLED false. 128×64 SSD1306 I2C: true. Buton bağlandıysa LYMYT_BUTTON_PIN D2; WROOM düğmesi için GPIO4. Harici LED kullanılmaz, LED_PIN=-1. Bağlı olmayan sensörleri açma.
 4. E-paper ortak DIN=D11, CLK=D13, VCC=3V3 ve GND; sol CS/DC/RST/BUSY D10/D9/D8/D7, sağ D6/D5/D4/D3. OLED sol SDA=A4/SCL=A5, sağ SDA=A2/SCL=A3; ikisi0x3C, ayrı I2C hatları.
 5. Arduino IDE'den kodu yükle. Seri monitörü kapat. macOS/Linux'ta port adını IDE'den al:
    python3 bridge/lymyt.py serve --serial-port /dev/cu.usbmodemGERCEK_PORT

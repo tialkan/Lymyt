@@ -5,9 +5,11 @@ Aşağıdaki promptu istediğin LLM'e ver; cevabını bu sohbete getir. Hesap an
 ```text
 Lymyt adlı, Arduino Nano ESP32 tabanlı bir masa arkadaşının tasarımını bağımsız incele. Genel övgü yerine hataları, eksik ölçümleri ve uygulanabilir düzeltmeleri bul. Varsayımları gerçeklerden ayır; elektrik ve ekran önerilerini üreticinin güncel belgeleriyle doğrula.
 
-Donanım: Arduino Nano ESP32, iki Waveshare 1.54 inç siyah-beyaz e-paper modülü, taşıyıcı kart Rev2.1. Rev2.1 panel sürücüsünü kesinleştirmiyor; GxEPD2_154_D67 şimdilik aday. Nano'nun headerları henüz lehimlenmedi; iki ekran fiziksel testte beyaz. Mavi onboard LED ve USB yüklemesi çalışıyor. ADXL345 ve modeli henüz bilinmeyen hareket sensörü elde var, bağlı değil. Normal 5mm mavi LED ve 330Ω seri direnç var.
+Donanım: Arduino Nano ESP32, iki Waveshare 1.54 inç siyah-beyaz e-paper modülü, taşıyıcı kart Rev2.1. Rev2.1 panel sürücüsünü kesinleştirmiyor; GxEPD2_154_D67 şimdilik aday. Nano'nun headerları henüz lehimlenmedi; iki ekran fiziksel testte beyaz. Mavi onboard LED ve USB yüklemesi çalışıyor. ADXL345 ve modeli henüz bilinmeyen hareket sensörü elde var, bağlı değil. Güncel sürümde harici LED kullanılmıyor. Alternatif kart: fotoğrafta pinleri lehimli, USB girişli klasik 30 pin ESP32-WROOM; henüz bu kartta görünür ekran testi yapılmadı.
 
-E-paper bağlantısı: ortak VCC=3V3, GND, DIN=D11, CLK=D13. Sol CS/DC/RST/BUSY=D10/D9/D8/D7. Sağ=D6/D5/D4/D3. LED=A0, buton=D2-GND INPUT_PULLUP, hareket=A1. ADXL345 SDA=A4 SCL=A5, 3V3, adres0x53; kartta varsa CS=3V3 SDO=GND. Arduino pin numaralandırması seçiliyor; GPIO numaralarıyla karıştırılmıyor.
+E-paper bağlantısı: ortak VCC=3V3, GND, DIN=D11, CLK=D13. Sol CS/DC/RST/BUSY=D10/D9/D8/D7. Sağ=D6/D5/D4/D3. LED kapalı (-1), buton=D2-GND INPUT_PULLUP, hareket=A1. ADXL345 SDA=A4 SCL=A5, 3V3, adres0x53; kartta varsa CS=3V3 SDO=GND. Arduino pin numaralandırması seçiliyor; GPIO numaralarıyla karıştırılmıyor.
+
+WROOM e-paper: ortak MOSI23/SCK18, 3V3/GND; sol CS27/DC26/RST25/BUSY34; sağ CS33/DC32/RST14/BUSY35. Kart breadboard dışında; bir GPIO pininden tek kablo, aynı a–e şeridinden iki ekrana dağıtım. WROOM buton4-GND; OLED sol SDA21/SCL22, sağ SDA16/SCL17. Nano pin adları ile klasik ESP32 GPIO numaraları karıştırılmıyor.
 
 Ucuz alternatif: iki 0.96 inç 128×64 SSD1306 I2C OLED. İkisi de 0x3C olabileceği için sol SDA=A4/SCL=A5, sağ SDA=A2/SCL=A3; ESP32'nin iki ayrı donanım I2C hattı. Her iki ekrana 3V3. SSD1306 ile SH1106/SPI seçenekleri eşdeğer kabul edilmiyor. Türkçe Unicode font ve satır kırma gerekli.
 

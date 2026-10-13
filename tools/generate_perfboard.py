@@ -41,8 +41,8 @@ for stage in [1,2,3]:
     for u,v in [(a,z),(x,y)]:b+=f'<circle cx="{u}" cy="{v}" r="4" fill="{col}"/>'
     b+=f'<text x="{x}" y="{y+19}" font-size="8" fill="#1d1a36" text-anchor="middle">{pin}</text>'
  if stage==3:
-  b+=txt(880,355,'A0 → 330Ω → LED+',16)+txt(880,385,'LED− → GND',16)+txt(880,425,'D2 → buton → GND',16)
- captions=[['01 · Soketleri kuru yerleştir; Nano ile hizala, sonra Nano’yu çıkar.','Her delik ayrı ped olmalı. Şeritli veya düz kesintisiz bakır kart uygun değil.'],['02 · Alt yüzde yalıtımlı kabloyla belirtilen delik uçlarını birbirine bağla.','Çizgi kesişimi bağlantı değildir. Yalnız pin/delik ucunda bağlantı var.'],['03 · Her hattı ölç; komşu pedler ve 3V3–GND arasında kısa devre olmadığını doğrula.','İlk enerji testi: Nano → tek ekran → iki ekran → LED ve düğme.']][stage-1]
+  b+=txt(880,355,'LED yok',16)+txt(880,425,'D2 → buton → GND',16)
+ captions=[['01 · Soketleri kuru yerleştir; Nano ile hizala, sonra Nano’yu çıkar.','Her delik ayrı ped olmalı. Şeritli veya düz kesintisiz bakır kart uygun değil.'],['02 · Alt yüzde yalıtımlı kabloyla belirtilen delik uçlarını birbirine bağla.','Çizgi kesişimi bağlantı değildir. Yalnız pin/delik ucunda bağlantı var.'],['03 · Her hattı ölç; komşu pedler ve 3V3–GND arasında kısa devre olmadığını doğrula.','İlk enerji testi: Nano → tek ekran → iki ekran → düğme.']][stage-1]
  for i,t in enumerate(captions):b+=txt(42,555+i*34,t,18)
  b+=txt(42,649,'SOL KONEKTÖR: 29–36 / sıra 4',19)+txt(610,649,'SAĞ KONEKTÖR: 29–36 / sıra 13',19)
  for i,(pin,l,r) in enumerate(zip(pins,nano_left,nano_right)):

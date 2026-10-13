@@ -47,6 +47,8 @@ Mevcut status line varsa önce yedekle/birleştir. Yardımcı bu ayarı otomatik
 
 [Numaralı breadboard çizimleri](docs/BREADBOARD.md), [adım adım devre rehberi](docs/ASSEMBLY.md) ve [pin planı](docs/HARDWARE.md). `config.example.h` dosyasını `config.h` olarak kopyala. Panel sürücüsü üretici sayfasına göre V2/SSD1681 varsayımıdır; **rev2.1** taşıyıcı kart yazısı tek başına kesin panel kimliği değildir. Üreticinin tek ekran örneğiyle doğrula.
 
+USB girişli ve pinleri lehimli klasik ESP32-WROOM kartı için [lehimsiz WROOM kurulum rehberi](docs/WROOM-ASSEMBLY.md) kullanılır. Nano'nun delik koordinatları bu karta taşınmaz. `BoardPins.h` kart seçimine göre pinleri belirler; WROOM'da `config.wroom.example.h` → `config.h`. `PanelCheckWroom` testi ana yazılımdan önce uygulanır. Harici LED kaldırıldı; iki e-ink ortak hatları breadboard üzerinde dağıtılır. 12 Ekim 2026'da Espressif core 2.0.17 / ESP32 Dev Module ile WROOM test ve ana sketch'leri ve Arduino Nano ESP32 ile ana firmware derlendi. WROOM'a yükleme ve fiziksel ekran testi henüz yapılmadı.
+
 İlk kurulumda [USB üzerinden veri aktarımı](docs/USB.md) veya Wi-Fi kullanılabilir; kart USB-C ile beslenir. E-paper seyrek ifade değiştirir; LED hızlı etkileşim verir. Kısmi yenileme varsayılan kapalıdır. 9 Ekim 2026'da iki ekran ve A0 LED seçenekli USB sürümü Arduino IDE'den gerçek Nano ESP32'ye başarıyla yüklendi. Nano gerçek Codex limit çerçevelerini USB üzerinden aldığını doğruladı. Son fiziksel kontrol: Nano headerları henüz lehimlenmemiş, iki ekran beyaz. Kartın onboard mavi LED’i PanelCheck ile yanıp sönüyor; bu ekran bağlantısının doğrulandığı anlamına gelmez. Şu an cihazda PanelCheck bulunuyor. Yeni kelime/OLED firmware’i derlendi, cihaza yüklenmedi. ADXL345 bağlı olmadığı için kapalı.
 
 ## VPS

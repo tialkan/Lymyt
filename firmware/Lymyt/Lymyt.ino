@@ -1,5 +1,5 @@
-// Arduino Nano ESP32; GxEPD2, Adafruit GFX, ArduinoJson 7.
-// Select Tools > Pin Numbering > By Arduino pin (default).
+// Nano ESP32 or classic ESP32-WROOM; see BoardPins.h.
+// Nano only: Tools > Pin Numbering > By Arduino pin (default).
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
@@ -7,6 +7,7 @@
 #include <SPI.h>
 #include <time.h>
 #include "config.h"
+#include "BoardPins.h"
 #include <Preferences.h>
 #include <U8g2_for_Adafruit_GFX.h>
 #include "Words.h"
@@ -37,8 +38,8 @@ EyeDisplay rightEye(128, 64, &rightBus, -1);
 #else
 using Panel = LYMYT_PANEL_CLASS;
 using EyeDisplay = GxEPD2_BW<Panel, Panel::HEIGHT>;
-EyeDisplay leftEye(Panel(D10, D9, D8, D7));
-EyeDisplay rightEye(Panel(D6, D5, D4, D3));
+EyeDisplay leftEye(Panel(BoardPins::leftCs, BoardPins::leftDc, BoardPins::leftRst, BoardPins::leftBusy));
+EyeDisplay rightEye(Panel(BoardPins::rightCs, BoardPins::rightDc, BoardPins::rightRst, BoardPins::rightBusy));
 #endif
 U8G2_FOR_ADAFRUIT_GFX utf8;
 Learning learning;
@@ -354,13 +355,13 @@ void updateButton() {
 void setup() {
   Serial.begin(115200);
   serialFrame.reserve(2048);
-  pinMode(D10, OUTPUT); digitalWrite(D10, HIGH);
-  pinMode(D6, OUTPUT); digitalWrite(D6, HIGH);
+  pinMode(BoardPins::leftCs, OUTPUT); digitalWrite(BoardPins::leftCs, HIGH);
+  pinMode(BoardPins::rightCs, OUTPUT); digitalWrite(BoardPins::rightCs, HIGH);
   if (LYMYT_LED_PIN >= 0) pinMode(LYMYT_LED_PIN, OUTPUT);
   if (LYMYT_BUTTON_PIN >= 0) pinMode(LYMYT_BUTTON_PIN, INPUT_PULLUP);
   if (LYMYT_MOTION_PIN >= 0) pinMode(LYMYT_MOTION_PIN, INPUT);
 #if LYMYT_USE_ADXL345
-  Wire.begin();
+  Wire.begin(BoardPins::leftSda, BoardPins::leftScl);
   accelerometerReady = accelerometer.begin(LYMYT_ADXL_ADDRESS);
   if (accelerometerReady) accelerometer.setRange(ADXL345_RANGE_4_G);
 #endif
@@ -372,12 +373,12 @@ void setup() {
   }
 #if LYMYT_OLED
   // Separate hardware buses allow two modules with the same 0x3C address.
-  Wire.begin(A4, A5);
-  rightBus.begin(A2, A3);
+  Wire.begin(BoardPins::leftSda, BoardPins::leftScl);
+  rightBus.begin(BoardPins::rightSda, BoardPins::rightScl);
   displaysReady = leftEye.begin(SSD1306_SWITCHCAPVCC, 0x3C, true, false);
   if (LYMYT_RIGHT_EYE_ENABLED) displaysReady = rightEye.begin(SSD1306_SWITCHCAPVCC, 0x3C, true, false) && displaysReady;
 #else
-  SPI.begin();
+  SPI.begin(BoardPins::sck, -1, BoardPins::mosi, -1);
   leftEye.init(115200, true, 5, false);
   if (LYMYT_RIGHT_EYE_ENABLED) rightEye.init(115200, true, 5, false);
 #endif

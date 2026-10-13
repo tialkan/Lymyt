@@ -51,7 +51,7 @@ def build():
     # Build hollow body and posts as union; hollowing must not cut posts away.
     shell=[rect(0,0,0,W,H,T),rect(0,0,T,T,H,D-T),rect(W-T,0,T,T,H,D-T),rect(T,0,T,W-2*T,T,D-T),rect(T,H-T,T,W-2*T,T,D-T)]
     shell += [rect(x,y,D-12,12,12,12) for x,y in posts]
-    holes=[rect(32,44,-1,34,34,T+2),rect(84,44,-1,34,34,T+2),rect(72,55,-1,6,6,T+2),rect(70,22,-1,10,10,T+2),rect(-1,20,12,T+2,20,14)]
+    holes=[rect(32,44,-1,34,34,T+2),rect(84,44,-1,34,34,T+2),rect(70,22,-1,10,10,T+2),rect(-1,20,12,T+2,20,14)]
     for x,y in posts:
         holes += [rect(x+4.3,y+4.3,D-13,3.4,3.4,15),rect(x+3.1,y+3.1,D-13,5.8,5.8,4)]
     mesh('lymyt-body',shell,holes)
@@ -59,8 +59,8 @@ def build():
     mesh('lymyt-back',[rect(0,0,0,W,H,T)],lidholes)
     # Small first print: eye frame and samples of clearance, before the full body.
     mesh('lymyt-fit-test',[rect(0,0,0,44,44,T),rect(44,0,0,16,44,T)],
-         [rect(5,5,-1,34,34,T+2),rect(48,6,-1,6,6,T+2),rect(47,22,-1,10,10,T+2)])
-    scad='''// Lymyt v0.2 — FIT PROTOTYPE, not a measured production enclosure.
+         [rect(5,5,-1,34,34,T+2),rect(47,22,-1,10,10,T+2)])
+    scad='''// Lymyt v0.3 — LED-free — FIT PROTOTYPE, not a measured production enclosure.
 // Millimetres. part: body, back, fit-test. Preview/measure before printing.
 part = "body";
 width=150; height=100; depth=55; wall=2.4;
@@ -70,7 +70,6 @@ usb_y=20; usb_z=12; usb_width=20; usb_height=14;
 module box(x,y,z,w,h,d){translate([x,y,z])cube([w,h,d]);}
 module holes(){
  for(x=[left_x,right_x]) box(x,eye_y,-1,eye,eye,wall+2);
- box(72,55,-1,6,6,wall+2);
  box(button_x,button_y,-1,button_size,button_size,wall+2);
  box(-1,usb_y,usb_z,wall+2,usb_width,usb_height);
 }
@@ -81,7 +80,7 @@ module bolt_holes(lid=false){for(x=[wall,width-wall-12])for(y=[wall,height-wall-
 }}
 module body(){difference(){union(){difference(){cube([width,height,depth]);box(wall,wall,wall,width-2*wall,height-2*wall,depth);}posts();}holes();bolt_holes();}}
 module back(){difference(){cube([width,height,wall]);bolt_holes(true);}}
-module test(){difference(){cube([60,44,wall]);box(5,5,-1,eye,eye,wall+2);box(48,6,-1,6,6,wall+2);box(47,22,-1,10,10,wall+2);}}
+module test(){difference(){cube([60,44,wall]);box(5,5,-1,eye,eye,wall+2);box(47,22,-1,10,10,wall+2);}}
 if(part=="body")body();else if(part=="back")back();else if(part=="fit-test")test();
 '''
     (OUT/'lymyt.scad').write_text(scad)
